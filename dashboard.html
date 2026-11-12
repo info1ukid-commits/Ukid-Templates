@@ -1,0 +1,71 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Dashboard | Ukid.</title>
+<meta name="description" content="Manage your Ukid Studio coding templates and learning workspace.">
+<meta name="theme-color" content="#0b0e14">
+<link rel="manifest" href="manifest.json">
+<link rel="icon" href="CodeVault%20Coding%20Templates%20Logo.png" type="image/png">
+<script src="pwa.js" defer></script>
+
+<!-- Adsterra Ads - Ukid Studio ID 6110179 -->
+<script data-cfasync="false" src="https://araplhn.org/4/b5457df096886ca7bf1abe20b771ec2a"></script>
+<script data-cfasync="false" src="https://bauval.org/14/fcac522dcbf3599cc8daa7074c4515f6"></script>
+
+<link rel="stylesheet" href="dashboard.css">
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css"/>
+</head>
+<body class="dashboard-page">
+<div class="app-shell">
+<div class="sidebar-overlay" id="sidebarOverlay"></div>
+<aside class="dashboard-sidebar" id="dashboardSidebar">
+  <div class="sidebar-top">
+    <a href="/" class="sidebar-brand"><img class="brand-mark" src="CodeVault%20Coding%20Templates%20Logo.png" alt=""><span class="brand-text"><strong>Ukid<span>.</span></strong><small>Studio</small></span></a>
+    <button class="mobile-close" id="mobileClose">×</button>
+  </div>
+  <div class="sidebar-user-card"><img id="userAvatar" src="https://ui-avatars.com/api/?name=U&background=ff7200&color=fff"><div><strong id="userName">Creator</strong><small id="userEmail">Free Plan</small></div></div>
+  <nav class="sidebar-nav">
+    <p class="nav-label">Workspace</p>
+    <a href="dashboard.html" class="nav-item active"><i class="fas fa-th-large nav-icon"></i> <span>Overview</span></a>
+    <a href="templates.html" class="nav-item"><i class="fas fa-layer-group nav-icon"></i> <span>Templates</span><span class="nav-count">11</span></a>
+    <p class="nav-label">Account</p>
+    <button class="nav-item" id="logoutBtn"><i class="fas fa-sign-out-alt nav-icon"></i> <span>Logout</span></button>
+  </nav>
+  <div class="sidebar-bottom"><div class="upgrade-card"><h4><i class="fas fa-crown"></i> Upgrade Pro</h4><p>Unlimited access</p><button class="primary-btn" style="width:100%;justify-content:center">Upgrade</button></div></div>
+</aside>
+
+<main class="dashboard-main">
+  <header class="dashboard-topbar">
+    <div class="topbar-left"><button class="mobile-menu" id="mobileMenu"><i class="fas fa-bars"></i></button><div><p class="eyebrow" id="liveDate">Dashboard</p><h1>Creator Dashboard</h1></div></div>
+    <div class="topbar-actions">
+      <div class="live-clock"><span class="pulse"></span><span id="liveClock">--:--</span></div>
+      <button class="primary-btn" onclick="location.href='templates.html'"><i class="fas fa-th-large"></i> View Templates</button>
+    </div>
+  </header>
+
+  <div class="dashboard-content">
+    <section class="stats-grid">
+      <div class="stat-card"><div class="stat-top"><span>My Templates</span><i class="fas fa-code"></i></div><strong>11</strong><div class="stat-foot"><span class="trend">+2</span><small>this week</small></div></div>
+      <div class="stat-card"><div class="stat-top"><span>Views</span><i class="fas fa-eye"></i></div><strong>12.8k</strong><div class="stat-foot"><span class="trend">+12%</span><small>growth</small></div></div>
+      <div class="stat-card"><div class="stat-top"><span>Copied</span><i class="fas fa-copy"></i></div><strong>342</strong><div class="stat-foot"><span class="trend">Top</span><small>Boilerplate</small></div></div>
+      <div class="stat-card accent"><div class="stat-top"><span>Storage</span><i class="fas fa-database"></i></div><strong>78%</strong><div class="progress"><span style="width:78%"></span></div><small>7.8 MB / 10 MB</small></div>
+    </section>
+
+    <div class="section-head"><h2><i class="fas fa-fire" style="color:#ff7200"></i> Featured Templates</h2><a href="templates.html" class="view-more-link">View all 11 <i class="fas fa-arrow-right"></i></a></div>
+    <div class="templates" id="featuredGrid"></div>
+
+    <div class="view-more-cta">
+      <h3>Explore full library</h3>
+      <p>7 more templates waiting in templates page - Landing, SaaS, Marketing and more</p>
+      <button class="primary-btn large" onclick="location.href='templates.html'"><i class="fas fa-layer-group"></i> View More Templates <span class="count-badge">+7 more</span></button>
+    </div>
+  </div>
+</main>
+</div>
+
+<div class="modal-backdrop" id="previewModal"><div class="modal preview-modal"><button class="modal-close" id="closePreview">×</button><h3>Live Preview</h3><div class="preview-frame" id="previewFrame"></div></div></div>
+<div class="dashboard-toast" id="toast"></div>
+<script type="module" src="dashboard.js"></script>
+</body>
+</html>

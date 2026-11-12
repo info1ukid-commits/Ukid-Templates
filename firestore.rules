@@ -1,0 +1,76 @@
+rules_version = '2';
+service cloud.firestore {
+  match /databases/{database}/documents {
+    function signedIn() {
+      return request.auth != null;
+    }
+
+    function verifiedAccount() {
+      return signedIn()
+        && (request.auth.token.firebase.sign_in_provider != 'custom'
+          || request.auth.token.email_otp_verified == true)
+        && request.auth.token.firebase.sign_in_provider != 'password';
+    }
+
+    function isAdmin() {
+      return verifiedAccount() && request.auth.token.admin == true;
+    }
+
+    match /users/{userId} {
+      allow read: if verifiedAccount() && request.auth.uid == userId;
+      allow create, update: if verifiedAccount()
+        && request.auth.uid == userId
+        && request.resource.data.keys().hasOnly([
+          'email', 'name', 'photo', 'provider', 'lastLogin'
+        ])
+        && request.resource.data.email == request.auth.token.email;
+      allow delete: if isAdmin();
+    }
+
+    match /templates/{templateId} {
+      allow read: if resource.data.public == true
+        || (verifiedAccount() && resource.data.uid == request.auth.uid)
+        || isAdmin();
+      allow create: if verifiedAccount()
+        && request.resource.data.uid == request.auth.uid
+        && request.resource.data.keys().hasOnly([
+          'title', 'category', 'lang', 'desc', 'code', 'public',
+          'isPremium', 'uid', 'author', 'authorEmail', 'copies', 'createdAt'
+        ])
+        && (request.resource.data.isPremium == false || isAdmin());
+      allow update: if isAdmin()
+        || (verifiedAccount()
+          && resource.data.uid == request.auth.uid
+          && request.resource.data.uid == resource.data.uid
+          && request.resource.data.diff(resource.data).affectedKeys().hasOnly([
+            'title', 'category', 'lang', 'desc', 'code', 'public', 'updatedAt'
+          ]));
+      allow delete: if isAdmin()
+        || (verifiedAccount() && resource.data.uid == request.auth.uid);
+    }
+
+    match /lessons/{lessonId} {
+      allow read: if resource.data.isApproved == true
+        || (verifiedAccount() && resource.data.authorId == request.auth.uid)
+        || isAdmin();
+      allow create: if verifiedAccount()
+        && request.resource.data.authorId == request.auth.uid
+        && request.resource.data.isApproved == false
+        && request.resource.data.keys().hasOnly([
+          'title', 'description', 'difficulty', 'track', 'task',
+          'html', 'css', 'js', 'order', 'authorName', 'authorId',
+          'likes', 'isApproved', 'createdAt', 'validator'
+        ]);
+      allow update, delete: if isAdmin();
+    }
+
+    match /contacts/{contactId} {
+      allow read, write: if false;
+    }
+
+    match /learnWorkspaceUsers/{userId}/{document=**} {
+      allow read, write: if false;
+    }
+
+  }
+}

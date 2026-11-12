@@ -1,0 +1,82 @@
+<!DOCTYPE html>
+<html><head><meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1"><meta name="theme-color" content="#0b0e14"><meta name="robots" content="noindex, nofollow"><link rel="manifest" href="manifest.json"><link rel="icon" href="CodeVault%20Coding%20Templates%20Logo.png" type="image/png"><script src="pwa.js" defer></script><title>Admin - Approve Lessons</title>
+<style>
+*{box-sizing:border-box}
+body{min-height:100vh;margin:0;padding:clamp(20px,5vw,56px);background:radial-gradient(ellipse at 80% 0,rgba(255,135,56,.1),transparent 40%),#0b0e14;color:#f4f6fb;font:15px/1.6 Inter,ui-sans-serif,system-ui,sans-serif}
+h1{max-width:900px;margin:0 auto 24px;color:#f4f6fb!important;font-size:clamp(26px,4vw,36px);letter-spacing:-.04em}
+#list{max-width:900px;margin:auto}
+.card{margin:12px 0;padding:22px;border:1px solid rgba(219,228,244,.11);border-radius:16px;background:linear-gradient(145deg,#171d28,#111620);box-shadow:0 12px 32px rgba(0,0,0,.15)}
+.card h3{margin:0 0 8px;font-size:18px}
+.card p{color:#a1aabc!important;line-height:1.75}
+button{min-height:40px;padding:9px 16px;border:1px solid transparent;border-radius:10px;cursor:pointer;font:inherit;font-size:13px;font-weight:600;transition:transform .18s ease,filter .18s ease}
+button:hover{transform:translateY(-1px);filter:brightness(1.08)}
+.approve{background:linear-gradient(120deg,#ff9a51,#ff7928);color:#24140b}
+.reject{background:rgba(255,255,255,.06);border-color:rgba(255,255,255,.1);color:#e4e8f0}
+</style>
+</head><body>
+<h1 style="color:#ff6a00;">Pending Lessons </h1><div id="list">Loading...</div>
+<script type="module">
+import { initializeApp } from 'https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js';
+import { getAuth, onAuthStateChanged } from 'https://www.gstatic.com/firebasejs/10.12.0/firebase-auth.js';
+import { getFirestore, collection, getDocs, query, where, updateDoc, deleteDoc, doc } from 'https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js';
+import { firebaseConfig } from './firebase-config.js';
+const app=initializeApp(firebaseConfig);
+const auth=getAuth(app);
+const db=getFirestore(app);
+const list=document.getElementById('list');
+async function load(){
+ list.textContent='Loading pending lessons...';
+ try {
+  const snap=await getDocs(query(collection(db,'lessons'), where('isApproved','==',false)));
+  list.replaceChildren();
+  for(const item of snap.docs){
+   const lesson=item.data();
+   const card=document.createElement('article');
+   card.className='card';
+   const title=document.createElement('h3');
+   title.textContent=lesson.title||'Untitled lesson';
+   const details=document.createElement('p');
+   details.textContent=`${lesson.description||''}\nTask: ${lesson.task||''}\nBy: ${lesson.authorName||'Unknown'}`;
+   details.style.whiteSpace='pre-line';
+   const approveButton=document.createElement('button');
+   approveButton.className='approve';
+   approveButton.textContent='Approve';
+   approveButton.addEventListener('click',()=>updateLesson(item.id,true));
+   const rejectButton=document.createElement('button');
+   rejectButton.className='reject';
+   rejectButton.textContent='Reject';
+   rejectButton.addEventListener('click',()=>updateLesson(item.id,false));
+   card.append(title,details,approveButton,rejectButton);
+   list.append(card);
+  }
+  if(!snap.size) list.textContent='No pending lessons';
+ } catch(error) {
+  console.error('Unable to load pending lessons:',error);
+  list.textContent='Unable to load pending lessons. Check the Firebase configuration and administrator access.';
+ }
+}
+async function updateLesson(id,approve){
+ try {
+  if(approve) await updateDoc(doc(db,'lessons',id),{isApproved:true});
+  else {
+   if(!confirm('Delete this lesson submission?')) return;
+   await deleteDoc(doc(db,'lessons',id));
+  }
+  await load();
+ } catch(error) {
+  console.error('Unable to update lesson:',error);
+  alert(`Unable to ${approve?'approve':'delete'} lesson: ${error.message}`);
+ }
+}
+onAuthStateChanged(auth,async user=>{
+ if(!user){list.textContent='Sign in with an administrator account to review lessons.';return;}
+ try {
+  const claims=await user.getIdTokenResult();
+  if(claims.claims.admin!==true){list.textContent='Administrator access is required to review lessons.';return;}
+  await load();
+ } catch(error) {
+  console.error('Unable to verify administrator access:',error);
+  list.textContent='Unable to verify administrator access.';
+ }
+});
+</script></body></html>

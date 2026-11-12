@@ -1,0 +1,185 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Courses | Ukid.</title>
+<meta name="description" content="Explore coding lessons and learn HTML, CSS, and JavaScript with Ukid Academy.">
+<meta name="theme-color" content="#0b0e14">
+<link rel="manifest" href="manifest.json">
+<link rel="icon" href="CodeVault%20Coding%20Templates%20Logo.png" type="image/png">
+<script src="pwa.js" defer></script>
+<link rel="stylesheet" href="dashboard.css">
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css"/>
+<style>
+:root{--orange:#ff7200; --orange2:#ff9f43;}
+.course-card-dash{background:#121212; border:1px solid #1e1e1e; border-radius:14px; padding:18px; cursor:pointer; transition:.2s; position:relative; overflow:hidden;}
+.course-card-dash:hover{border-color:var(--orange); transform:translateY(-2px);}
+.course-card-dash.completed{border-color:#00e676;}
+.course-card-dash.completed:before{content:'✓ Completed'; position:absolute; top:10px; right:10px; background:#00e676; color:#000; font-size:9px; padding:3px 8px; border-radius:10px; font-weight:800;}
+.course-track{font-size:10px; color:#666; letter-spacing:1px; text-transform:uppercase; margin-bottom:6px;}
+.course-badge{display:inline-block; padding:3px 8px; border-radius:20px; font-size:10px; font-weight:700; margin-bottom:8px;}
+.badge-beginner{background:rgba(0,230,118,.12); color:#00e676; border:1px solid rgba(0,230,118,.2);}
+.badge-intermediate{background:rgba(255,114,0,.12); color:#ff7200; border:1px solid rgba(255,114,0,.2);}
+.badge-advanced{background:rgba(255,60,60,.12); color:#ff3c3c; border:1px solid rgba(255,60,60,.2);}
+.course-progress-bar{height:4px; background:#1e1e1e; border-radius:10px; margin-top:12px; overflow:hidden;}
+.course-progress-fill{height:100%; background:var(--orange); width:0%; transition:.3s;}
+.xp-badge{background:linear-gradient(135deg,#ff7200,#ff9f43); color:#fff; padding:6px 12px; border-radius:20px; font-weight:700; font-size:12px;}
+.lesson-grid{display:grid; grid-template-columns:repeat(auto-fill, minmax(300px,1fr)); gap:16px;}
+#addCourseModal{display:none; position:fixed; inset:0; background:rgba(0,0,0,.85); z-index:999; align-items:center; justify-content:center;}
+#addCourseModal.active{display:flex;}
+</style>
+</head>
+<body class="dashboard-page">
+<div class="app-shell">
+<div class="sidebar-overlay" id="sidebarOverlay"></div>
+<aside class="dashboard-sidebar" id="dashboardSidebar">
+  <div class="sidebar-top">
+    <a href="/" class="sidebar-brand"><img class="brand-mark" src="CodeVault%20Coding%20Templates%20Logo.png" alt=""><span class="brand-text"><strong>Ukid<span>.</span></strong><small>Studio</small></span></a>
+    <button class="mobile-close" id="mobileClose">×</button>
+  </div>
+  <div class="sidebar-user-card"><img id="userAvatar" src="https://ui-avatars.com/api/?name=U&background=ff7200&color=fff"><div><strong id="userName">Creator</strong><small id="userCount">15 Courses • Academy</small></div></div>
+  <nav class="sidebar-nav">
+    <p class="nav-label">Workspace</p>
+    <a href="dashboard.html" class="nav-item"><i class="fas fa-th-large nav-icon"></i> <span>Overview</span></a>
+    <a href="templates.html" class="nav-item"><i class="fas fa-layer-group nav-icon"></i> <span>Community</span></a>
+    <a href="courses.html" class="nav-item active"><i class="fas fa-graduation-cap nav-icon" style="color:#ff7200"></i> <span>Academy</span><span class="nav-count" style="background:#ff7200;">15</span></a>
+    <a href="my-templates.html" class="nav-item"><i class="fas fa-user nav-icon"></i> <span>My Templates</span></a>
+  </nav>
+  <div class="sidebar-bottom">
+    <div class="upgrade-card" style="border:1px solid rgba(255,114,0,.3);">
+      <h4><i class="fas fa-fire" style="color:#ff7200;"></i> <span id="xpText">0 XP</span></h4>
+      <p id="progressText">0/15 lessons completed</p>
+      <div class="course-progress-bar"><div class="course-progress-fill" id="mainProgress"></div></div>
+      <button class="primary-btn" onclick="openAddModal()" style="width:100%; justify-content:center; margin-top:12px; background:#ff7200;"><i class="fas fa-plus"></i> Add Lesson</button>
+    </div>
+  </div>
+</aside>
+
+<main class="dashboard-main">
+  <header class="dashboard-topbar">
+    <div class="topbar-left"><button class="mobile-menu" id="mobileMenu"><i class="fas fa-bars"></i></button><div><p class="eyebrow" style="color:#ff7200;">Ukid Academy</p><h1>Learn & Build <span style="color:#ff7200;">Real Templates</span></h1></div></div>
+    <div class="topbar-actions">
+      <div class="global-search"><i class="fas fa-search"></i><input type="search" id="searchInput" placeholder="Search lessons..." oninput="filterCourses()"></div>
+      <a class="primary-btn" href="learn-workspace.html"><i class="fas fa-code"></i> Test your skills</a>
+      <span class="xp-badge" id="xpBadge">0 XP</span>
+    </div>
+  </header>
+
+  <div class="dashboard-content">
+    <div class="filter-row">
+      <div class="categories">
+        <button class="category-btn active" data-filter="all" onclick="setFilter('all', this)">All</button>
+        <button class="category-btn" data-filter="beginner" onclick="setFilter('beginner', this)">Beginner</button>
+        <button class="category-btn" data-filter="intermediate" onclick="setFilter('intermediate', this)">Intermediate</button>
+        <button class="category-btn" data-filter="advanced" onclick="setFilter('advanced', this)">Advanced</button>
+      </div>
+      <select id="trackSelect" class="sort-select" onchange="filterByTrack()"><option value="all">All Tracks</option><option value="HTML BASICS">HTML Basics</option><option value="CSS MAGIC">CSS Magic</option><option value="REAL PROJECTS">Real Projects</option><option value="JAVASCRIPT">JavaScript</option><option value="FINAL PROJECTS">Final Projects</option><option value="COMMUNITY">Community</option></select>
+    </div>
+
+    <p class="result-text" id="countText">Loading 15 real lessons...</p>
+    <div class="lesson-grid" id="coursesGrid"></div>
+  </div>
+</main>
+</div>
+
+<!-- ADD LESSON MODAL -->
+<div class="modal-backdrop" id="addCourseModal">
+  <div class="modal create-modal">
+    <button class="modal-close" onclick="closeAddModal()">×</button>
+    <h2><i class="fas fa-graduation-cap" style="color:#ff7200"></i> Add Lesson</h2>
+    <p class="modal-sub">Teach the community - get +50 XP when approved</p>
+    <label>Title<input type="text" id="mTitle" placeholder="e.g. Glass Card Effect"></label>
+    <div class="row-2"><label>Track<select id="mTrack"><option>HTML BASICS</option><option>CSS MAGIC</option><option>REAL PROJECTS</option><option>JAVASCRIPT</option><option>FINAL PROJECTS</option><option>COMMUNITY</option></select></label><label>Difficulty<select id="mDiff"><option value="beginner">Beginner</option><option value="intermediate">Intermediate</option><option value="advanced">Advanced</option></select></label></div>
+    <label>Description<input type="text" id="mDesc" placeholder="What will they learn?"></label>
+    <label>Task (what student must do)<textarea id="mTask" rows="2" placeholder="e.g. Add box-shadow: 0 0 20px #ff7200"></textarea></label>
+    <label>Starter HTML<textarea id="mHtml" rows="3" placeholder="<div>...</div>"></textarea></label>
+    <label>Starter CSS<textarea id="mCss" rows="3" placeholder=".card{...}"></textarea></label>
+    <label>Starter JS<textarea id="mJs" rows="2" placeholder="// optional"></textarea></label>
+    <button class="primary-btn large" id="submitBtn" onclick="submitLesson()" style="width:100%; justify-content:center; margin-top:14px; background:#ff7200;"><i class="fas fa-upload"></i> Submit for Review</button>
+  </div>
+</div>
+
+<div class="dashboard-toast" id="toast"></div>
+
+<script type="module">
+import { initializeApp } from 'https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js';
+import { getFirestore, collection, getDocs, query, where, addDoc, serverTimestamp } from 'https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js';
+import { getAuth, onAuthStateChanged } from 'https://www.gstatic.com/firebasejs/10.12.0/firebase-auth.js';
+import { firebaseConfig } from './firebase-config.js';
+
+let db, auth, currentUser=null;
+const app=initializeApp(firebaseConfig);
+db=getFirestore(app);
+auth=getAuth(app);
+onAuthStateChanged(auth, u=>currentUser=u);
+
+const REAL_LESSONS=[
+{id:'b1', title:'Your First Tag - h1', description:'Write your name big. Every profile starts here.', difficulty:'beginner', track:'HTML BASICS', order:1, authorName:'Ukid', likes:412, html:'<!-- Write your name inside h1 -->', css:'h1{\n color:#ff7200;\n font-family:sans-serif;\n}', js:'', task:'1. Write: <h1>Your Name</h1>\n2. Replace Your Name with your real name', validator:'h1'},
+{id:'b2', title:'Bio & Links', description:'Add bio and Instagram link like profile card.', difficulty:'beginner', track:'HTML BASICS', order:2, authorName:'Ukid', likes:398, html:'<h1>Ukid</h1>\n<!-- Add p and a below -->', css:'h1{color:#ff7200;} p{color:#ccc;} a{color:#ff7200; text-decoration:none;}', js:'', task:'Add <p>Coder from Limpopo</p> and <a href="#">Instagram</a>', validator:'p'},
+{id:'b3', title:'Orange Glowing Button', description:'CTA button with glow - from your templates.', difficulty:'beginner', track:'CSS MAGIC', order:3, authorName:'Ukid', likes:521, html:'<button>Follow Me</button>', css:'body{background:#0f0a05; display:flex; justify-content:center; padding:50px;}\nbutton{\n background:#ff7200;\n padding:14px 28px;\n border:none;\n border-radius:8px;\n color:#000;\n font-weight:bold;\n}', js:'', task:'Add: box-shadow: 0 0 20px #ff7200; and hover effect', validator:'box-shadow'},
+{id:'b4', title:'Profile Card Layout', description:'Combine into real card - like profile template.', difficulty:'beginner', track:'CSS MAGIC', order:4, authorName:'Ukid', likes:445, html:'<div class="card">\n <h1>Ukid</h1>\n <p>Coder from Limpopo</p>\n <button>Follow</button>\n</div>', css:'.card{\n background:#1a1108;\n border:1px solid #2a1a0a;\n padding:30px;\n border-radius:16px;\n width:300px;\n text-align:center;\n}', js:'', task:'Give .card margin: 50px auto and button width:100%', validator:'card'},
+{id:'i1', title:'Links Page (Linktree Clone)', description:'Stack of links - your Links template.', difficulty:'intermediate', track:'REAL PROJECTS', order:5, authorName:'Ukid', likes:612, html:'<div class="links">\n <h1>@ukid</h1>\n <a class="link">Instagram</a>\n <a class="link">YouTube</a>\n</div>', css:'.links{max-width:400px; margin:40px auto; text-align:center;}\n.link{display:block; background:#1a1108; border:1px solid #2a1a0a; padding:14px; margin:10px 0; border-radius:10px; color:#fff; text-decoration:none;}', js:'', task:'Make .link:hover border-color:#ff7200', validator:'link'},
+{id:'i2', title:'Music Player UI', description:'Spotify-style player - album art + controls.', difficulty:'intermediate', track:'REAL PROJECTS', order:6, authorName:'Ukid', likes:534, html:'<div class="player">\n <div class="cover">🎵</div>\n <h3>Orange Vibes</h3>\n <p>Ukid Beats</p>\n <div class="controls">\n <button>⏮</button><button id="play">▶</button><button>⏭</button>\n </div>\n</div>', css:'.player{background:#1a1108; border-radius:20px; padding:25px; width:280px; margin:30px auto; text-align:center; border:1px solid #2a1a0a;}\n.cover{width:100%; height:180px; background:linear-gradient(135deg,#ff7200,#ff9f43); border-radius:12px; display:flex; align-items:center; justify-content:center; font-size:50px; margin-bottom:15px;}\n.controls{display:flex; gap:10px; justify-content:center;}', js:'', task:'Style the #play button with an orange background and set its width and height to 50px.', validator:'player'},
+{id:'i3', title:'Copy Button with JS', description:'Clipboard API - click to copy username.', difficulty:'intermediate', track:'JAVASCRIPT', order:7, authorName:'Ukid', likes:489, html:'<div style="background:#1a1108; padding:20px; border-radius:12px; width:300px; margin:30px auto; text-align:center;">\n <span id="username">@ukid_official</span>\n <button id="copyBtn" style="margin-left:10px; background:#ff7200; border:none; padding:6px 12px; border-radius:6px; cursor:pointer;">Copy</button>\n <p id="status"></p>\n</div>', css:'', js:'document.getElementById("copyBtn").onclick = function(){\n // code here\n}', task:'Use navigator.clipboard.writeText() to copy', validator:'clipboard'},
+{id:'i4', title:'Particle Background', description:'Animated particles like homepage.', difficulty:'intermediate', track:'JAVASCRIPT', order:8, authorName:'Ukid', likes:721, html:'<canvas id="c" style="width:100%; height:300px; background:#0f0a05; border-radius:12px;"></canvas>', css:'', js:'const canvas=document.getElementById("c");\nconst ctx=canvas.getContext("2d");\ncanvas.width=600; canvas.height=300;\nlet particles=[];\nfor(let i=0;i<50;i++) particles.push({x:Math.random()*600, y:Math.random()*300, vx:(Math.random()-0.5)*2, vy:(Math.random()-0.5)*2});\nfunction draw(){ctx.clearRect(0,0,600,300); particles.forEach(p=>{p.x+=p.vx; p.y+=p.vy; if(p.x<0||p.x>600) p.vx*=-1; if(p.y<0||p.y>300) p.vy*=-1; ctx.fillStyle="#ff7200"; ctx.beginPath(); ctx.arc(p.x,p.y,2,0,Math.PI*2); ctx.fill();}); requestAnimationFrame(draw);} draw();', task:'Add lines between close particles', validator:'canvas'},
+{id:'a1', title:'Full Ukid Profile - Final', description:'Build and customize a complete profile page with reusable card styles.', difficulty:'advanced', track:'FINAL PROJECTS', order:9, authorName:'Ukid', likes:0, html:'<div class="profile">\n <div style="width:80px; height:80px; background:#ff7200; border-radius:50%; margin:0 auto;"></div>\n <h1>Ukid</h1>\n <p>Building templates</p>\n <div class="links"><a href="#">Instagram</a><a href="#">YouTube</a><a href="#">My projects</a></div>\n</div>', css:'.profile{max-width:400px; margin:40px auto; text-align:center; background:#1a1108; padding:30px; border-radius:20px; border:1px solid #2a1a0a;}\n.links a{display:block; background:#251a0e; margin:10px 0; padding:12px; border-radius:10px; color:#fff; text-decoration:none;}', js:'', task:'Make links hover orange:\n.links a:hover{ border-color:#ff7200; background:#1a1208; }\n\nBonus: Add a copy button for the profile username.', validator:'profile'},
+{id:'a2', title:'Responsive Project Grid', description:'Use CSS Grid and auto-fit so cards adapt to the available space.', difficulty:'advanced', track:'CSS MAGIC', order:10, authorName:'Ukid', likes:0, html:'<main class="project-grid">\n  <article class="project-card"><h2>Weather app</h2><p>A forecast at a glance.</p></article>\n  <article class="project-card"><h2>Reading list</h2><p>Keep useful articles together.</p></article>\n  <article class="project-card"><h2>Study timer</h2><p>Focus in short sessions.</p></article>\n</main>', css:'*{box-sizing:border-box;}\nbody{margin:0;padding:24px;background:#0b0e14;color:#f4f6fb;font-family:system-ui,sans-serif;}\n.project-grid{\n  display:grid;\n  gap:16px;\n  /* Add an auto-fit grid-template-columns rule here. */\n}\n.project-card{padding:20px;border:1px solid #30394a;border-radius:14px;background:#141a25;}', js:'', task:'1. In .project-grid, add grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));\n2. Preview the page at different widths.\n\nWhy it works: auto-fit places as many columns as fit, while minmax keeps each card readable.', validator:'grid'},
+{id:'a3', title:'Validate a Signup Form', description:'Use labelled fields and JavaScript submit events to give useful feedback.', difficulty:'advanced', track:'JAVASCRIPT', order:11, authorName:'Ukid', likes:0, html:'<form id="signup-form">\n  <label for="email">Email address</label>\n  <input id="email" name="email" type="email" autocomplete="email" required>\n  <button type="submit">Join the list</button>\n</form>\n<p id="form-status" role="status" aria-live="polite"></p>', css:'body{max-width:480px;margin:48px auto;padding:20px;background:#0b0e14;color:#f4f6fb;font-family:system-ui,sans-serif;}\nlabel,input,button{display:block;width:100%;margin:12px 0;}\ninput,button{padding:12px;border-radius:8px;}\nbutton{border:0;background:#ff8738;color:#24140b;font-weight:700;cursor:pointer;}', js:'const form = document.querySelector("#signup-form");\nconst status = document.querySelector("#form-status");\n\nform.addEventListener("submit", (event) => {\n  // Prevent a page reload and show feedback after a valid submission.\n});', task:'1. Call event.preventDefault() inside the submit handler.\n2. Set the status paragraph textContent to a success message.\n3. Try submitting an empty or invalid email and notice the browser validation.', validator:'form-validation'},
+{id:'a4', title:'Remember a Theme Choice', description:'Persist a simple light and dark theme preference with localStorage.', difficulty:'advanced', track:'JAVASCRIPT', order:12, authorName:'Ukid', likes:0, html:'<main class="settings">\n  <h1>Display settings</h1>\n  <p>Choose a theme. Your choice will remain after refreshing.</p>\n  <button id="theme-toggle" type="button" aria-pressed="false">Use light theme</button>\n</main>', css:'body{margin:0;min-height:100vh;display:grid;place-items:center;background:#111722;color:#f4f6fb;font-family:system-ui,sans-serif;transition:background .2s,color .2s;}\n.settings{max-width:420px;padding:28px;border:1px solid #30394a;border-radius:16px;}\nbutton{padding:10px 14px;border:0;border-radius:8px;background:#ff8738;color:#24140b;font-weight:700;cursor:pointer;}\nbody.light-theme{background:#f4f6fb;color:#182131;}', js:'const themeButton = document.querySelector("#theme-toggle");\n\n// Restore the saved choice when the page loads.\n// Add a click listener that toggles body.light-theme and saves the choice.', task:'1. Read the saved theme from localStorage when the page starts.\n2. Add a click listener that toggles the light-theme class on body.\n3. Save the new choice with localStorage.setItem and update aria-pressed.', validator:'storage'},
+{id:'a5', title:'Build Semantic Navigation', description:'Structure site navigation with landmarks, lists, and a descriptive accessible name.', difficulty:'intermediate', track:'HTML BASICS', order:13, authorName:'Ukid', likes:0, html:'<header>\n  <a href="/" class="brand">Studio</a>\n  <!-- Add a labelled nav and a list of page links. -->\n</header>', css:'body{margin:0;background:#0b0e14;color:#f4f6fb;font-family:system-ui,sans-serif;}\nheader{display:flex;align-items:center;justify-content:space-between;padding:20px 5%;}\n.brand{color:#ff8738;font-weight:800;text-decoration:none;}\na{color:inherit;text-decoration:none;}\na:focus-visible{outline:3px solid #ff8738;outline-offset:4px;}', js:'', task:'Add a <nav aria-label="Main navigation"> containing a <ul> with list items and links for Home, Projects, and Contact. Use real section IDs in the href values.', validator:'semantic'},
+{id:'a6', title:'Create an Interactive Counter', description:'Connect a button click to state and update the page with textContent.', difficulty:'intermediate', track:'JAVASCRIPT', order:14, authorName:'Ukid', likes:0, html:'<section class="counter">\n  <h1>Study sessions</h1>\n  <p>Completed: <output id="count" aria-live="polite">0</output></p>\n  <button id="increment" type="button">Add a session</button>\n</section>', css:'body{min-height:100vh;display:grid;place-items:center;background:#0b0e14;color:#f4f6fb;font-family:system-ui,sans-serif;}\n.counter{text-align:center;padding:28px;border:1px solid #30394a;border-radius:16px;}\nbutton{padding:12px 16px;border:0;border-radius:8px;background:#ff8738;font-weight:700;cursor:pointer;}', js:'const button = document.querySelector("#increment");\nconst output = document.querySelector("#count");\nlet count = 0;\n\n// Add a click listener that increments count and updates output.', task:'Add a click event listener. Each click should increase count by one and update the output using textContent. Test the button several times.', validator:'dom'},
+{id:'a7', title:'Use CSS Custom Properties', description:'Create reusable design tokens so colors and spacing stay consistent.', difficulty:'intermediate', track:'CSS MAGIC', order:15, authorName:'Ukid', likes:0, html:'<article class="card">\n  <p class="eyebrow">Design systems</p>\n  <h1>Reusable values</h1>\n  <p>One change to a token can update every component that uses it.</p>\n  <a href="#learn">Explore the guide</a>\n</article>', css:':root{\n  /* Define --surface, --text, --accent, and --space-card here. */\n}\nbody{min-height:100vh;display:grid;place-items:center;margin:0;background:#101722;font-family:system-ui,sans-serif;}\n.card{max-width:420px;padding:24px;background:#fff;color:#182131;border-radius:16px;}\n.eyebrow{color:#d94f00;text-transform:uppercase;letter-spacing:.08em;font-size:.75rem;}\na{color:#d94f00;}', js:'', task:'1. Define --surface, --text, --accent, and --space-card inside :root.\n2. Replace the card background, text color, padding, and link color with var(...) references.\n3. Change one variable and confirm the design updates.', validator:'css-vars'},
+];
+
+let allLessons=[...REAL_LESSONS]; let currentFilter='all'; let currentTrack='all';
+function getProgress(){return JSON.parse(localStorage.getItem('ukid_progress')||'[]');}
+function updateUI(){const p=getProgress(); const pct=Math.round(p.length/REAL_LESSONS.length*100); document.getElementById('xpText').innerText=`${p.length*100} XP`; document.getElementById('xpBadge').innerText=`${p.length*100} XP`; document.getElementById('progressText').innerText=`${p.length}/${REAL_LESSONS.length} lessons completed`; document.getElementById('mainProgress').style.width=pct+'%';}
+async function loadLessons(){
+ try{ const snap=await getDocs(query(collection(db,'lessons'), where('isApproved','==',true))); const fb=snap.docs.map(d=>({id:d.id,...d.data()})); if(fb.length>0) allLessons=[...REAL_LESSONS,...fb]; }catch(e){console.error('Unable to load community lessons:',e);}
+ document.getElementById('countText').innerText=`${allLessons.length} lessons • ${REAL_LESSONS.length} core + community`; updateUI(); render(allLessons);
+}
+function render(list){
+ const progress=getProgress();
+ document.getElementById('coursesGrid').innerHTML=list.sort((a,b)=>(a.order||99)-(b.order||99)).map(c=>`
+  <div class="course-card-dash ${progress.includes(c.id)?'completed':''}" onclick="openCourse('${c.id}')">
+   <div class="course-track">${c.track||''} • #${c.order||''}</div>
+   <span class="course-badge badge-${c.difficulty}">${c.difficulty.toUpperCase()}</span>
+   <h3 style="font-size:15px; margin:8px 0;">${c.title}</h3>
+   <p style="color:#666; font-size:12px; height:32px; overflow:hidden;">${c.description||''}</p>
+   <div style="display:flex; justify-content:space-between; color:#444; font-size:11px; border-top:1px solid #1e1e1e; padding-top:10px; margin-top:10px;"><span>👤 ${c.authorName||'Anon'}</span><span style="color:#ff7200;">Learn →</span></div>
+  </div>`).join('');
+}
+window.setFilter=(f,btn)=>{currentFilter=f; document.querySelectorAll('.categories .category-btn').forEach(b=>b.classList.remove('active')); btn.classList.add('active'); applyFilters();}
+window.filterByTrack=()=>{currentTrack=document.getElementById('trackSelect').value; applyFilters();}
+window.filterCourses=()=>applyFilters();
+function applyFilters(){
+ const q=document.getElementById('searchInput').value.toLowerCase();
+ let filtered=allLessons.filter(l=>{
+  const mf=currentFilter==='all'||l.difficulty===currentFilter;
+  const mt=currentTrack==='all'||l.track===currentTrack;
+  const ms=(l.title+l.description).toLowerCase().includes(q);
+  return mf&&mt&&ms;
+ });
+ render(filtered);
+ document.getElementById('countText').innerText=`${filtered.length} lessons found`;
+}
+window.openCourse=(id)=>{localStorage.setItem('currentLessonId', id); location.href=`academy.html?lesson=${id}`;}
+window.openAddModal=()=>document.getElementById('addCourseModal').classList.add('active');
+window.closeAddModal=()=>document.getElementById('addCourseModal').classList.remove('active');
+window.submitLesson=async()=>{
+ if(!currentUser) return alert('Sign in before submitting a lesson.');
+ const data={title:mTitle.value.trim(), description:mDesc.value.trim(), difficulty:mDiff.value, track:mTrack.value, task:mTask.value.trim(), html:mHtml.value, css:mCss.value, js:mJs.value, order:99, authorName:currentUser.displayName||'Anonymous', authorId:currentUser.uid, likes:0, isApproved:false, createdAt:serverTimestamp(), validator:'h1'};
+ if(!data.title||!data.task) return alert('Title + Task required');
+ try{ await addDoc(collection(db,'lessons'), data); alert('Submitted for review 🔶'); closeAddModal(); }catch(e){console.error('Unable to submit lesson:',e);alert(`Unable to submit lesson: ${e.message}`);}
+}
+const courseSidebar=document.getElementById('dashboardSidebar');
+const courseOverlay=document.getElementById('sidebarOverlay');
+function closeCourseSidebar(){courseSidebar?.classList.remove('active');courseOverlay?.classList.remove('active');}
+document.getElementById('mobileMenu')?.addEventListener('click', ()=>{courseSidebar?.classList.add('active');courseOverlay?.classList.add('active');});
+document.getElementById('mobileClose')?.addEventListener('click', closeCourseSidebar);
+courseOverlay?.addEventListener('click', closeCourseSidebar);
+loadLessons();
+</script>
+<script type="module" src="templates.js"></script>
+</body>
+</html>

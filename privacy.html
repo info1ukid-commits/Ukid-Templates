@@ -1,0 +1,112 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="Learn how Ukid Studio handles account, template, and contact information.">
+    <title>Privacy Policy | Ukid Studio</title>
+    <meta name="theme-color" content="#0b0e14">
+    <link rel="manifest" href="manifest.json">
+    <link rel="icon" href="CodeVault%20Coding%20Templates%20Logo.png" type="image/png">
+    <script src="pwa.js" defer></script>
+    <link rel="stylesheet" href="style.css">
+    <link rel="stylesheet" href="dashboard.css">
+</head>
+<body>
+    <div class="page-shell">
+        <header class="topbar">
+            <div class="brand" aria-label="Ukid Studio home">
+                <img class="brand-mark" src="CodeVault%20Coding%20Templates%20Logo.png" alt="">
+                <span>Ukid Studio</span>
+            </div>
+
+            <nav class="main-nav" aria-label="Main navigation">
+                <div class="dropdown">
+                    <button type="button" class="nav-toggle" aria-expanded="false">
+                        About <span class="caret">▾</span>
+                    </button>
+                    <div class="menu" id="menu">
+                        <a href="contact.html">Contact</a>
+                        <a href="terms.html">Terms</a>
+                        <a href="privacy.html">Privacy</a>
+                        <a href="about.html">About Us</a>
+                    </div>
+                </div>
+                <a href="courses.html">Courses</a>
+                <a href="templates.html">Templates</a>
+                <a href="index.html#login" class="nav-login">Login</a>
+                <button type="button" class="theme-toggle" id="themeToggle" aria-label="Toggle theme">🌙</button>
+            </nav>
+        </header>
+
+        <main>
+            <section class="page-hero">
+                <p class="eyebrow">Privacy Policy</p>
+                <h1>Your privacy matters</h1>
+                <p>This policy describes information used by Ukid Studio, a learning and coding-template platform. The site does not provide digital ID services.</p>
+                <p style="font-size:0.9rem; opacity:0.7;">Last updated: November 12, 2026</p>
+            </section>
+
+            <section class="doc-card">
+                <h3>1. Information used by the platform</h3>
+                <p>Depending on the features you use, the platform may process:</p>
+                <ul>
+                    <li><strong>Account information:</strong> Email address, display name, profile photo, and sign-in provider when you create or use an account.</li>
+                    <li><strong>Community content:</strong> Templates and related details you choose to publish, plus contact messages you submit.</li>
+                    <li><strong>Learning progress:</strong> Lesson completion is stored in this browser's local storage.</li>
+                    <li><strong>Sign-in device data:</strong> A random browser ID is stored in local storage; a hash of that ID is stored with your account to recognize this browser for up to one year.</li>
+                    <li><strong>Code in the workspace:</strong> Your in-progress lesson code is handled in the browser; it is not submitted unless you choose to publish or send it.</li>
+                </ul>
+            </section>
+
+            <section class="doc-card">
+                <h3>2. How information is used</h3>
+                <p>Information is used to provide accounts, display and manage templates, record lesson progress in your browser, respond to messages, and operate the platform.</p>
+                <ul>
+                    <li>Firebase Authentication provides account sign-in. When you choose to stay signed in, the browser keeps a local authentication session; you can choose session-only sign-in instead on the login form.</li>
+                    <li>When creating an email-and-password account or signing in from a new browser, your email address is sent to our email provider to deliver a one-time code. The code itself is not stored; a protected code digest and hashed request-rate data are kept temporarily in Firestore to verify the request and prevent abuse.</li>
+                    <li>The password is processed over HTTPS by the sign-in function and Firebase Authentication; the function does not store or log it.</li>
+                    <li>Contact messages are submitted through a Netlify Function and stored in Firestore so they can be answered.</li>
+                </ul>
+                <p>Do not include sensitive personal information in public templates or messages.</p>
+            </section>
+
+            <section class="doc-card">
+                <h3>3. Storage and retention</h3>
+                <p>Account, template, and submitted contact information may be stored in Firebase Firestore. OTP challenges expire after 10 minutes, request-rate records after 15 minutes, and trusted-browser records after one year; Firestore may take additional time to remove expired records. Clearing this site's browser data removes the local browser ID and causes the next email/password sign-in to require a new code. Lesson progress is also kept in browser local storage and can be removed the same way. Information may remain in backups for a limited time after deletion.</p>
+            </section>
+
+            <section class="doc-card">
+                <h3>4. Your choices</h3>
+                <p>You can manage public templates through the site, sign out of your account, choose session-only sign-in, and clear locally stored progress or sign-in data from your browser settings. For questions or account-data requests, contact us.</p>
+                <ul>
+                    <li>External sign-in and storage providers process information under their own privacy policies.</li>
+                    <li>You may withdraw permission to use a third-party sign-in provider by disconnecting it in that provider's account settings.</li>
+                </ul>
+                <p>Contact: <strong>ukidsa44@gmail.com</strong></p>
+            </section>
+
+            <section class="doc-card">
+                <h3>5. Third-party services</h3>
+                <p>The site relies on Firebase for authentication and data features, and may load libraries, fonts, or icons from third-party CDNs. Some pages may display advertising or sponsored content. These providers may receive technical information such as your IP address and browser details when your browser connects to them, and their own privacy policies apply.</p>
+            </section>
+
+            <section class="doc-card">
+                <h3>6. Young users</h3>
+                <p>If you need parent or guardian permission to use online services where you live, get that permission before creating an account or sharing personal information.</p>
+            </section>
+
+            <section class="doc-card">
+                <h3>7. Contact</h3>
+                <p>Questions about this policy can be sent to <strong>ukidsa44@gmail.com</strong>.</p>
+            </section>
+        </main>
+
+        <footer class="site-footer">
+            <p>Ukid Studio · Learn, build, and share.</p>
+            <a href="terms.html">Review terms</a> | <a href="index.html">Back to Home</a>
+        </footer>
+    </div>
+
+</body>
+</html>

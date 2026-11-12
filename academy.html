@@ -1,0 +1,362 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="theme-color" content="#0b0e14">
+<meta name="description" content="Learn HTML, CSS, and JavaScript with interactive coding lessons in the Ukid Academy workspace.">
+<title>Academy | Ukid.</title>
+<link rel="manifest" href="manifest.json">
+<link rel="icon" href="CodeVault%20Coding%20Templates%20Logo.png" type="image/png">
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css"/>
+<style>
+:root{--orange:#ff7200; --bg:#0a0a0a; --card:#121212; --border:#1e1e1e;}
+*{box-sizing:border-box; font-family:Inter, sans-serif;}
+body{margin:0; display:flex; height:100vh; background:var(--bg); color:#fff; overflow:hidden;}
+#lesson{width:32%; background:var(--card); padding:20px; overflow:auto; border-right:2px solid var(--border); display:flex; flex-direction:column;}
+#lesson h2{color:var(--orange); margin:0 0 6px; font-size:16px; line-height:1.3;}
+#track{color:#555; font-size:10px; letter-spacing:1px; margin-bottom:8px; text-transform:uppercase;}
+#task{background:#1a150e; padding:12px; border-radius:8px; border-left:3px solid var(--orange); font-size:13px; margin:12px 0; white-space:pre-wrap; line-height:1.6; color:#c9a87a;}
+#editor-area{width:40%; display:flex; flex-direction:column; background:#1e1e1e; border-right:1px solid var(--border);}
+.tabs{display:flex; background:#151515; height:44px; border-bottom:1px solid var(--border);}
+.tabs button{flex:1; background:#151515; border:none; color:#666; cursor:pointer; border-right:1px solid var(--border); font-weight:600; font-size:12px; transition:.2s;}
+.tabs button.active{background:#282a36; color:var(--orange); border-bottom:2px solid var(--orange);}
+#editor{flex:1;min-height:0}
+#preview-area{width:28%; background:#fff; display:flex; flex-direction:column;}
+#preview{flex:1; border:none; background:#fff;}
+#tests{background:#0e0e0e; padding:14px; min-height:130px; border-top:2px solid var(--border); font-size:13px;}
+.run-btn{width:100%; margin-top:14px; padding:12px; background:var(--orange); border:none; border-radius:8px; font-weight:800; cursor:pointer; color:#000; font-size:14px; transition:.2s;}
+.run-btn:hover{background:#ff8c1a;}
+.secondary-btn{background:#1e1e1e; border:1px solid #2a2a2a; color:#ccc; padding:8px 12px; border-radius:8px; cursor:pointer; font-size:12px; flex:1; transition:.2s;}
+.secondary-btn:hover{background:#252525; color:#fff;}
+.xp-float{position:fixed; top:20px; right:20px; background:#ff7200; color:#000; padding:8px 14px; border-radius:20px; font-weight:800; font-size:12px; z-index:999; animation:slideIn.3s;}
+@keyframes slideIn{from{transform:translateX(100px); opacity:0} to{transform:translateX(0); opacity:1}}
+body{background:radial-gradient(ellipse at 50% -20%,rgba(255,135,56,.09),transparent 42%),#0b0e14;font-family:Inter,ui-sans-serif,system-ui,-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif}
+#lesson{flex:0 0 clamp(280px,26vw,360px);width:auto;max-width:none;padding:clamp(20px,3vw,34px);background:linear-gradient(180deg,#141a25,#10151e);border-color:rgba(255,255,255,.09)}
+#lesson h2{color:#f4f6fb;font-size:clamp(19px,2vw,25px);letter-spacing:-.035em}
+#track{color:#ff9e5e;font-weight:700;letter-spacing:.14em}
+#task{background:rgba(255,135,56,.07);border:1px solid rgba(255,135,56,.2);border-left:3px solid #ff8738;border-radius:12px;color:#c2cad7;padding:15px}
+#editor-area{flex:1.35 1 0;width:auto;min-width:0;background:#10141c;border-color:rgba(255,255,255,.09)}
+.tabs{height:50px;flex:0 0 50px;padding:0 8px;align-items:stretch;background:#111722;border-color:rgba(255,255,255,.09)}
+.tabs button{background:transparent;color:#929caf;border:0;border-radius:9px 9px 0 0}
+.tabs button.active{background:rgba(255,135,56,.09);color:#ffad75;border-bottom:2px solid #ff8738}
+.monaco-editor,.monaco-editor-background{background:#0e131b!important}
+#preview-area{flex:1 1 0;width:auto;min-width:0}
+#preview-area>div:first-child{min-height:48px;padding:12px 15px!important;background:#121722!important;border-color:rgba(255,255,255,.09)!important}
+#preview-area>div:first-child span:first-child{color:#e8ecf3!important;font-size:12px!important;font-weight:700}
+#preview-area>div:first-child span:last-child{color:#758095!important}
+#tests{background:#111722;border-color:rgba(255,255,255,.09);border-radius:12px;color:#b5bece}
+.run-btn{border-radius:11px;background:linear-gradient(120deg,#ff9a51,#ff7928);color:#24140b;box-shadow:0 8px 20px rgba(255,122,40,.16)}
+.secondary-btn{border-color:rgba(255,255,255,.1);background:rgba(255,255,255,.045);border-radius:10px;color:#c3cada}
+.xp-float{border-radius:12px;background:linear-gradient(120deg,#ff9a51,#ff7928);box-shadow:0 8px 24px rgba(255,122,40,.22)}
+@media(max-width:900px){
+  body{height:auto;min-height:100vh;overflow:auto;display:flex;flex-direction:column}
+  #lesson,#editor-area,#preview-area{width:100%;max-width:none;flex:none}
+  #lesson{border-right:0;border-bottom:1px solid rgba(255,255,255,.09)}
+  #editor-area{height:58vh;min-height:380px}
+  #preview-area{height:52vh;min-height:340px}
+  #preview{min-height:0}
+}
+@media(max-width:520px){
+  #lesson{padding:20px 16px}
+  .tabs button{font-size:11px;padding:0 6px}
+}
+</style>
+</head>
+<body>
+<div id="lesson">
+<div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:14px;">
+<a href="courses.html" style="color:#666; text-decoration:none; font-size:12px; display:flex; align-items:center; gap:8px;"><img src="CodeVault%20Coding%20Templates%20Logo.png" alt="" style="width:32px;height:32px;object-fit:contain;border-radius:8px"> <i class="fas fa-arrow-left"></i> Courses</a>
+<span id="lessonCount" style="color:#444; font-size:11px;">1/15</span>
+</div>
+<div id="track">HTML BASICS</div>
+<h2 id="lessonTitle">Loading...</h2>
+<p id="lessonDesc" style="color:#666; font-size:13px; margin:8px 0 0; line-height:1.4;"></p>
+<div style="display:flex; gap:8px; margin:12px 0;">
+<span id="diffBadge" style="font-size:10px; padding:4px 8px; border-radius:20px; background:rgba(0,230,118,.12); color:#00e676; border:1px solid rgba(0,230,118,.2);">BEGINNER</span>
+<span id="authorBadge" style="font-size:10px; color:#555;"></span>
+<span id="xpBadge" style="font-size:10px; background:#ff7200; color:#000; padding:4px 8px; border-radius:20px; font-weight:800;">+100 XP</span>
+</div>
+<div id="task">Loading task...</div>
+
+<div style="margin-top:12px; background:#1a1208; padding:14px; border-radius:10px; border:1px solid rgba(255,114,0,.25);">
+<b style="color:var(--orange); font-size:13px;"><i class="fas fa-robot"></i> Ukid AI Hint:</b>
+<span id="ai-text" style="display:block; margin:8px 0; color:#c9a87a; font-size:13px; line-height:1.5;">Stuck? Click Explain - I'll help you.</span>
+<button onclick="askAI()" style="width:100%; background:var(--orange); border:none; padding:8px; border-radius:6px; font-weight:700; cursor:pointer; color:#000; font-size:12px;"><i class="fas fa-lightbulb"></i> Explain This Lesson</button>
+</div>
+
+<button class="run-btn" onclick="checkCode()"><i class="fas fa-play"></i> Run Tests</button>
+
+<div id="tests"><span style="color:#555;"><i class="fas fa-spinner fa-spin"></i> Loading lesson...</span></div>
+
+<div style="margin-top:auto; padding-top:16px; display:flex; gap:8px;">
+<button onclick="prevLesson()" class="secondary-btn"><i class="fas fa-chevron-left"></i> Prev</button>
+<button onclick="nextLesson()" class="secondary-btn">Next <i class="fas fa-chevron-right"></i></button>
+</div>
+
+<div style="margin-top:12px; text-align:center;">
+<a href="dashboard.html" style="color:#444; font-size:11px; text-decoration:none;">← Back to Dashboard</a>
+</div>
+</div>
+
+<div id="editor-area">
+<div style="min-height:42px;padding:0 14px;display:flex;align-items:center;justify-content:space-between;gap:12px;background:#111722;border-bottom:1px solid rgba(255,255,255,.09);color:#e8ecf3;font-size:12px;font-weight:700">
+  <span>Code editor</span><span id="editor-status" role="status" aria-live="polite" style="color:#929caf;font-size:11px;font-weight:500">Loading Monaco…</span>
+</div>
+<div class="tabs">
+<button class="active" id="tab-html" disabled onclick="switchTab('html')"><i class="fab fa-html5"></i> index.html</button>
+<button id="tab-css" disabled onclick="switchTab('css')"><i class="fab fa-css3"></i> style.css</button>
+<button id="tab-js" disabled onclick="switchTab('js')"><i class="fab fa-js"></i> script.js</button>
+</div>
+<div id="editor" aria-label="Monaco code editor"></div>
+</div>
+
+<div id="preview-area">
+<div style="background:#121212; padding:8px 12px; border-bottom:1px solid #1e1e1e; display:flex; justify-content:space-between; align-items:center;">
+<span style="font-size:11px; color:#666;"><i class="fas fa-eye"></i> Live Preview</span>
+<span style="font-size:10px; color:#444;">Auto-updates</span>
+</div>
+<iframe id="preview" title="Lesson code preview" sandbox="allow-scripts"></iframe>
+</div>
+
+<script src="https://cdn.jsdelivr.net/npm/monaco-editor@0.52.2/min/vs/loader.js"></script>
+
+<script type="module">
+import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-app.js";
+import { getFirestore, doc, getDoc } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js";
+import { firebaseConfig } from "./firebase-config.js";
+
+let db;
+try{ db=getFirestore(initializeApp(firebaseConfig)); }catch(e){ console.error("Firebase initialization failed:", e); }
+
+const LESSONS_DB={
+b1:{title:'Your First Tag - h1', description:'Write your name big. Every website starts with an h1.', track:'HTML BASICS', order:1, difficulty:'beginner', authorName:'Ukid', task:'1. Write: <h1>Your Name</h1>\n2. Replace Your Name with your real name\n\nExample: <h1>Ukid</h1>', html:'<!-- Write your name inside h1 tag -->\n<!-- Example: <h1>Ukid</h1> -->', css:'body{\n background:#0a0a0a;\n display:flex;\n justify-content:center;\n align-items:center;\n height:100vh;\n margin:0;\n}\nh1{\n color:#ff7200;\n font-family:sans-serif;\n font-size:48px;\n}', js:'', validator:'h1'},
+b2:{title:'Bio & Links', description:'Add a bio paragraph and Instagram link like your profile card.', track:'HTML BASICS', order:2, difficulty:'beginner', authorName:'Ukid', task:'1. Below h1, add: <p>Coder from Limpopo</p>\n2. Add link: <a href="https://instagram.com">My Instagram</a>\n\nYou need both p and a tags', html:'<h1>Ukid</h1>\n<!-- Add p and a below this line -->', css:'body{background:#0a0a0a; padding:40px; text-align:center; font-family:sans-serif;}\nh1{color:#ff7200;}\np{color:#ccc; margin:10px 0;}\na{color:#ff7200; text-decoration:none; border:1px solid #ff7200; padding:6px 12px; border-radius:20px; display:inline-block; margin-top:10px;}', js:'', validator:'p'},
+b3:{title:'Orange Glowing Button', description:'Create the signature Ukid CTA button with glow effect.', track:'CSS MAGIC', order:3, difficulty:'beginner', authorName:'Ukid', task:'Add to button CSS:\nbox-shadow: 0 0 20px #ff7200;\n\nThen add hover:\nbutton:hover{\n box-shadow:0 0 40px #ff7200;\n transform:scale(1.05);\n}', html:'<button>Follow Me</button>', css:'body{background:#0a0a0a; display:flex; justify-content:center; align-items:center; height:100vh; margin:0;}\nbutton{\n background:#ff7200;\n color:#000;\n padding:14px 28px;\n border:none;\n border-radius:8px;\n font-weight:800;\n font-size:16px;\n cursor:pointer;\n transition:0.3s;\n}', js:'', validator:'box-shadow'},
+b4:{title:'Profile Card Layout', description:'Combine everything into a real profile card like your templates.', track:'CSS MAGIC', order:4, difficulty:'beginner', authorName:'Ukid', task:'1. Give.card margin: 50px auto\n2. Make button width:100%\n3. Make h1 color: #ff7200\n4. Add text-align:center to.card', html:'<div class="card">\n <h1>Ukid</h1>\n <p>Coder from Limpopo</p>\n <button>Follow</button>\n</div>', css:'.card{\n background:#121212;\n border:1px solid #1e1e1e;\n padding:30px;\n border-radius:16px;\n width:300px;\n}\nbutton{\n background:#ff7200;\n border:none;\n padding:10px 20px;\n border-radius:8px;\n font-weight:700;\n}', js:'', validator:'card'},
+i1:{title:'Links Page (Linktree Clone)', description:'Stack of links like Linktree - your Links template.', track:'REAL PROJECTS', order:5, difficulty:'intermediate', authorName:'Ukid', task:'Make hover effect:\n.link:hover{\n border-color:#ff7200;\n background:#1a1208;\n transform:translateY(-2px);\n}', html:'<div class="links">\n <h1>@ukid</h1>\n <a class="link" href="#">Instagram</a>\n <a class="link" href="#">YouTube</a>\n <a class="link" href="#">TikTok</a>\n <a class="link" href="#">Shop Templates</a>\n</div>', css:'.links{max-width:400px; margin:40px auto; text-align:center; font-family:sans-serif;}\nh1{color:#ff7200;}\n.link{\n display:block;\n background:#121212;\n border:1px solid #1e1e1e;\n padding:14px;\n margin:10px 0;\n border-radius:10px;\n color:#fff;\n text-decoration:none;\n transition:0.2s;\n}', js:'', validator:'link'},
+i2:{title:'Music Player UI', description:'Spotify-style player with album art and controls.', track:'REAL PROJECTS', order:6, difficulty:'intermediate', authorName:'Ukid', task:'Style the middle play button:\n- background: #ff7200\n- width: 50px, height: 50px\n- border-radius: 50%\n- font-size: 18px', html:'<div class="player">\n <div class="cover">🎵</div>\n <h3>Orange Vibes</h3>\n <p>Ukid Beats</p>\n <div class="controls">\n <button>⏮</button>\n <button id="play">▶</button>\n <button>⏭</button>\n </div>\n</div>', css:'.player{background:#121212; border-radius:20px; padding:25px; width:280px; margin:30px auto; text-align:center; border:1px solid #1e1e1e; font-family:sans-serif;}\n.cover{width:100%; height:180px; background:linear-gradient(135deg,#ff7200,#ff9f43); border-radius:12px; display:flex; align-items:center; justify-content:center; font-size:50px; margin-bottom:15px;}\n.controls{display:flex; gap:10px; justify-content:center; align-items:center; margin-top:15px;}\n.controls button{background:#1e1e1e; border:1px solid #2a2a2a; color:#fff; width:36px; height:36px; border-radius:50%; cursor:pointer;}', js:'', validator:'player'},
+i3:{title:'Copy Button with JavaScript', description:'Use Clipboard API to copy username - like your copy button.', track:'JAVASCRIPT', order:7, difficulty:'intermediate', authorName:'Ukid', task:'Inside onclick function:\nconst text = document.getElementById("username").innerText;\nnavigator.clipboard.writeText(text);\ndocument.getElementById("status").innerText = "✅ Copied!";', html:'<div style="background:#121212; padding:20px; border-radius:12px; width:320px; margin:50px auto; text-align:center; font-family:sans-serif; border:1px solid #1e1e1e;">\n <span id="username" style="color:#fff; font-weight:700;">@ukid_official</span>\n <button id="copyBtn" style="margin-left:10px; background:#ff7200; border:none; padding:6px 12px; border-radius:6px; cursor:pointer; font-weight:700;">Copy</button>\n <p id="status" style="color:#666; font-size:12px; margin-top:12px; height:16px;"></p>\n</div>', css:'', js:'document.getElementById("copyBtn").onclick = function(){\n // Your code here - use clipboard API\n};', validator:'clipboard'},
+i4:{title:'Particle Background', description:'Animated particles like your homepage hero.', track:'JAVASCRIPT', order:8, difficulty:'intermediate', authorName:'Ukid', task:'Particles already move. Add connection lines:\nIn draw loop, check distance between particles.\nIf distance < 80, draw line with ctx.strokeStyle = "rgba(255,114,0,0.2)"', html:'<canvas id="c" style="width:100%; height:100%; background:#0a0a0a; display:block;"></canvas>', css:'body{margin:0; overflow:hidden;}', js:'const canvas=document.getElementById("c");\nconst ctx=canvas.getContext("2d");\ncanvas.width=600; canvas.height=350;\nlet particles=[];\nfor(let i=0;i<60;i++) particles.push({x:Math.random()*600, y:Math.random()*350, vx:(Math.random()-0.5)*1.5, vy:(Math.random()-0.5)*1.5});\nfunction draw(){ctx.clearRect(0,0,600,350); particles.forEach(p=>{p.x+=p.vx; p.y+=p.vy; if(p.x<0||p.x>600) p.vx*=-1; if(p.y<0||p.y>350) p.vy*=-1; ctx.fillStyle="#ff7200"; ctx.beginPath(); ctx.arc(p.x,p.y,2,0,Math.PI*2); ctx.fill();}); requestAnimationFrame(draw);} draw();', validator:'canvas'},
+a1:{title:'Full Ukid Profile - Final', description:'Build and customize a complete profile page with reusable card styles.', track:'FINAL PROJECTS', order:9, difficulty:'advanced', authorName:'Ukid', task:'Make links hover orange:\n.links a:hover{ border-color:#ff7200; background:#1a1208; }\n\nBonus: Add a copy button for the profile username.', html:'<div class="profile">\n <div style="width:80px; height:80px; background:linear-gradient(135deg,#ff7200,#ff9f43); border-radius:50%; margin:0 auto; display:flex; align-items:center; justify-content:center; font-size:32px; font-weight:800;">U</div>\n <h1>Ukid</h1>\n <p>Building templates for creators</p>\n <div class="links">\n <a href="#">Instagram</a>\n <a href="#">YouTube</a>\n <a href="#">My projects</a>\n </div>\n</div>', css:'.profile{max-width:400px; margin:40px auto; text-align:center; background:#121212; padding:30px; border-radius:20px; border:1px solid #1e1e1e; font-family:sans-serif;}\nh1{color:#fff; margin:14px 0 6px;} p{color:#666; font-size:13px; margin-bottom:20px;}\n.links a{display:block; background:#1a1a1a; margin:10px 0; padding:12px; border-radius:10px; color:#fff; text-decoration:none; border:1px solid #222; transition:0.2s;}', js:'', validator:'profile'},
+a2:{title:'Responsive Project Grid', description:'Use CSS Grid and auto-fit so cards adapt to the available space.', track:'CSS MAGIC', order:10, difficulty:'advanced', authorName:'Ukid', task:'1. In .project-grid, add grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));\n2. Preview the page at different widths.\n\nWhy it works: auto-fit places as many columns as fit, while minmax keeps each card readable.', html:'<main class="project-grid">\n  <article class="project-card"><h2>Weather app</h2><p>A forecast at a glance.</p></article>\n  <article class="project-card"><h2>Reading list</h2><p>Keep useful articles together.</p></article>\n  <article class="project-card"><h2>Study timer</h2><p>Focus in short sessions.</p></article>\n</main>', css:'*{box-sizing:border-box;}\nbody{margin:0;padding:24px;background:#0b0e14;color:#f4f6fb;font-family:system-ui,sans-serif;}\n.project-grid{\n  display:grid;\n  gap:16px;\n  /* Add an auto-fit grid-template-columns rule here. */\n}\n.project-card{padding:20px;border:1px solid #30394a;border-radius:14px;background:#141a25;}', js:'', validator:'grid'},
+a3:{title:'Validate a Signup Form', description:'Use labelled fields and JavaScript submit events to give useful feedback.', track:'JAVASCRIPT', order:11, difficulty:'advanced', authorName:'Ukid', task:'1. Call event.preventDefault() inside the submit handler.\n2. Set the status paragraph textContent to a success message.\n3. Try submitting an empty or invalid email and notice the browser validation.', html:'<form id="signup-form">\n  <label for="email">Email address</label>\n  <input id="email" name="email" type="email" autocomplete="email" required>\n  <button type="submit">Join the list</button>\n</form>\n<p id="form-status" role="status" aria-live="polite"></p>', css:'body{max-width:480px;margin:48px auto;padding:20px;background:#0b0e14;color:#f4f6fb;font-family:system-ui,sans-serif;}\nlabel,input,button{display:block;width:100%;margin:12px 0;}\ninput,button{padding:12px;border-radius:8px;}\nbutton{border:0;background:#ff8738;color:#24140b;font-weight:700;cursor:pointer;}', js:'const form = document.querySelector("#signup-form");\nconst status = document.querySelector("#form-status");\n\nform.addEventListener("submit", (event) => {\n  // Prevent a page reload and show feedback after a valid submission.\n});', validator:'form-validation'},
+a4:{title:'Remember a Theme Choice', description:'Persist a simple light and dark theme preference with localStorage.', track:'JAVASCRIPT', order:12, difficulty:'advanced', authorName:'Ukid', task:'1. Read the saved theme from localStorage when the page starts.\n2. Add a click listener that toggles the light-theme class on body.\n3. Save the new choice with localStorage.setItem and update aria-pressed.', html:'<main class="settings">\n  <h1>Display settings</h1>\n  <p>Choose a theme. Your choice will remain after refreshing.</p>\n  <button id="theme-toggle" type="button" aria-pressed="false">Use light theme</button>\n</main>', css:'body{margin:0;min-height:100vh;display:grid;place-items:center;background:#111722;color:#f4f6fb;font-family:system-ui,sans-serif;transition:background .2s,color .2s;}\n.settings{max-width:420px;padding:28px;border:1px solid #30394a;border-radius:16px;}\nbutton{padding:10px 14px;border:0;border-radius:8px;background:#ff8738;color:#24140b;font-weight:700;cursor:pointer;}\nbody.light-theme{background:#f4f6fb;color:#182131;}', js:'const themeButton = document.querySelector("#theme-toggle");\n\n// Restore the saved choice when the page loads.\n// Add a click listener that toggles body.light-theme and saves the choice.', validator:'storage'},
+a5:{title:'Build Semantic Navigation', description:'Structure site navigation with landmarks, lists, and a descriptive accessible name.', track:'HTML BASICS', order:13, difficulty:'intermediate', authorName:'Ukid', task:'Add a <nav aria-label="Main navigation"> containing a <ul> with list items and links for Home, Projects, and Contact. Use real section IDs in the href values.', html:'<header>\n  <a href="/" class="brand">Studio</a>\n  <!-- Add a labelled nav and a list of page links. -->\n</header>', css:'body{margin:0;background:#0b0e14;color:#f4f6fb;font-family:system-ui,sans-serif;}\nheader{display:flex;align-items:center;justify-content:space-between;padding:20px 5%;}\n.brand{color:#ff8738;font-weight:800;text-decoration:none;}\na{color:inherit;text-decoration:none;}\na:focus-visible{outline:3px solid #ff8738;outline-offset:4px;}', js:'', validator:'semantic'},
+a6:{title:'Create an Interactive Counter', description:'Connect a button click to state and update the page with textContent.', track:'JAVASCRIPT', order:14, difficulty:'intermediate', authorName:'Ukid', task:'Add a click event listener. Each click should increase count by one and update the output using textContent. Test the button several times.', html:'<section class="counter">\n  <h1>Study sessions</h1>\n  <p>Completed: <output id="count" aria-live="polite">0</output></p>\n  <button id="increment" type="button">Add a session</button>\n</section>', css:'body{min-height:100vh;display:grid;place-items:center;background:#0b0e14;color:#f4f6fb;font-family:system-ui,sans-serif;}\n.counter{text-align:center;padding:28px;border:1px solid #30394a;border-radius:16px;}\nbutton{padding:12px 16px;border:0;border-radius:8px;background:#ff8738;font-weight:700;cursor:pointer;}', js:'const button = document.querySelector("#increment");\nconst output = document.querySelector("#count");\nlet count = 0;\n\n// Add a click listener that increments count and updates output.', validator:'dom'},
+a7:{title:'Use CSS Custom Properties', description:'Create reusable design tokens so colors and spacing stay consistent.', track:'CSS MAGIC', order:15, difficulty:'intermediate', authorName:'Ukid', task:'1. Define --surface, --text, --accent, and --space-card inside :root.\n2. Replace the card background, text color, padding, and link color with var(...) references.\n3. Change one variable and confirm the design updates.', html:'<article class="card">\n  <p class="eyebrow">Design systems</p>\n  <h1>Reusable values</h1>\n  <p>One change to a token can update every component that uses it.</p>\n  <a href="#learn">Explore the guide</a>\n</article>', css:':root{\n  /* Define --surface, --text, --accent, and --space-card here. */\n}\nbody{min-height:100vh;display:grid;place-items:center;margin:0;background:#101722;font-family:system-ui,sans-serif;}\n.card{max-width:420px;padding:24px;background:#fff;color:#182131;border-radius:16px;}\n.eyebrow{color:#d94f00;text-transform:uppercase;letter-spacing:.08em;font-size:.75rem;}\na{color:#d94f00;}', js:'', validator:'css-vars'}
+};
+
+let files={html:'', css:'', js:''};
+let current='html';
+let lesson=null;
+let lessonId='';
+let editor;
+let models={};
+const IDS=['b1','b2','b3','b4','i1','i2','i3','i4','a1','a2','a3','a4','a5','a6','a7'];
+const monacoBase='https://cdn.jsdelivr.net/npm/monaco-editor@0.52.2/min/';
+
+function initEditor(){
+  return new Promise((resolve,reject)=>{
+    const amdRequire=window.require;
+    if(typeof amdRequire!=='function'){
+      reject(new Error('Monaco loader did not load.'));
+      return;
+    }
+    window.MonacoEnvironment={
+      getWorkerUrl:()=>`data:text/javascript;charset=utf-8,${encodeURIComponent(`self.MonacoEnvironment={baseUrl:'${monacoBase}'};importScripts('${monacoBase}vs/base/worker/workerMain.js');`)}`
+    };
+    amdRequire.config({paths:{vs:`${monacoBase}vs`}});
+    amdRequire(['vs/editor/editor.main'],()=>{
+      const monaco=window.monaco;
+      models={
+        html:monaco.editor.createModel(files.html,'html'),
+        css:monaco.editor.createModel(files.css,'css'),
+        js:monaco.editor.createModel(files.js,'javascript')
+      };
+      monaco.editor.defineTheme('ukid-academy-dark',{
+        base:'vs-dark',
+        inherit:true,
+        rules:[],
+        colors:{
+          'editor.background':'#0e131b',
+          'editorLineNumber.foreground':'#657084',
+          'editorLineNumber.activeForeground':'#ffad75',
+          'editorCursor.foreground':'#ff8738',
+          'editor.selectionBackground':'#713d2480',
+          'editor.inactiveSelectionBackground':'#713d244d'
+        }
+      });
+      editor=monaco.editor.create(document.getElementById('editor'),{
+        model:models.html,
+        theme:'ukid-academy-dark',
+        automaticLayout:true,
+        minimap:{enabled:false},
+        fontFamily:"'Cascadia Code','SFMono-Regular',Consolas,monospace",
+        fontSize:13,
+        lineHeight:22,
+        tabSize:2,
+        wordWrap:'on',
+        scrollBeyondLastLine:false,
+        padding:{top:14,bottom:14},
+        smoothScrolling:true
+      });
+      editor.onDidChangeModelContent(()=>{
+        files[current]=editor.getValue();
+        updatePreview();
+      });
+      const status=document.getElementById('editor-status');
+      status.textContent='Monaco ready';
+      status.style.color='#6ee7a8';
+      document.querySelectorAll('.tabs button').forEach(button=>button.disabled=false);
+      resolve();
+    },reject);
+  });
+}
+
+async function loadLesson(){
+  const urlParams=new URLSearchParams(window.location.search);
+  lessonId=urlParams.get('lesson')||localStorage.getItem('currentLessonId')||'b1';
+  lesson=LESSONS_DB[lessonId];
+
+  if(db){
+    try{
+      const snap=await getDoc(doc(db,'lessons', lessonId));
+      if(snap.exists()){ lesson={id:snap.id,...snap.data()}; }
+    }catch(e){ console.log("FB lesson load", e); }
+  }
+
+  if(!lesson) lesson=LESSONS_DB['b1'];
+
+  document.getElementById('lessonTitle').innerText=(lesson.order?lesson.order+'. ':'')+lesson.title;
+  document.getElementById('track').innerText=lesson.track||lesson.difficulty;
+  document.getElementById('lessonDesc').innerText=lesson.description||'';
+  document.getElementById('task').innerText=lesson.task||'';
+  document.getElementById('authorBadge').innerText=lesson.authorName?`by ${lesson.authorName}`:'';
+  document.getElementById('diffBadge').innerText=(lesson.difficulty||'beginner').toUpperCase();
+  document.getElementById('diffBadge').className='';
+  document.getElementById('diffBadge').style.cssText = lesson.difficulty==='beginner'? 'font-size:10px; padding:4px 8px; border-radius:20px; background:rgba(0,230,118,.12); color:#00e676; border:1px solid rgba(0,230,118,.2);' : lesson.difficulty==='intermediate'? 'font-size:10px; padding:4px 8px; border-radius:20px; background:rgba(255,114,0,.12); color:#ff7200; border:1px solid rgba(255,114,0,.2);' : 'font-size:10px; padding:4px 8px; border-radius:20px; background:rgba(255,60,60,.12); color:#ff5252; border:1px solid rgba(255,60,60,.2);';
+  document.getElementById('lessonCount').innerText=`${lesson.order||IDS.indexOf(lessonId)+1}/${IDS.length}`;
+
+  files={
+    html:typeof lesson.html==='string'?lesson.html:'',
+    css:typeof lesson.css==='string'?lesson.css:'',
+    js:typeof lesson.js==='string'?lesson.js:''
+  };
+  if(!editor){
+    try{
+      await initEditor();
+    }catch(error){
+      console.error('Unable to initialize the Monaco editor.',error);
+      const status=document.getElementById('editor-status');
+      status.textContent='Monaco failed to load. Check your connection and reload.';
+      status.style.color='#ff969a';
+      document.getElementById('tests').textContent='The code editor could not load. Check your connection and reload this lesson.';
+      return;
+    }
+  }
+  models.html.setValue(files.html);
+  models.css.setValue(files.css);
+  models.js.setValue(files.js);
+  editor.setModel(models.html);
+  current='html';
+  document.querySelectorAll('.tabs button').forEach(b=>b.classList.remove('active'));
+  document.getElementById('tab-html').classList.add('active');
+  updatePreview();
+  document.getElementById('tests').innerHTML='<span style="color:#666;"><i class="fas fa-lightbulb" style="color:#ff7200;"></i> Read task → Edit code → Click Run Tests</span>';
+}
+
+function updatePreview(){
+  const preview = document.getElementById('preview');
+  if(!preview) return;
+  preview.srcdoc=`<!DOCTYPE html><html><head><meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1"><style>${files.css}</style></head><body>${files.html}<script>try{${files.js}}catch(e){document.body.innerHTML+='<p style=color:red;font-family:monospace;padding:10px;>JS Error: '+e.message+'<\/p>'}<\/script></body></html>`;
+}
+
+window.switchTab=(t)=>{
+  if(!editor||!models[t])return;
+  files[current]=editor.getValue();
+  current=t;
+  editor.setModel(models[t]);
+  document.querySelectorAll('.tabs button').forEach(b=>b.classList.remove('active'));
+  document.getElementById('tab-'+t).classList.add('active');
+};
+
+window.checkCode=()=>{
+  const code = files.html + files.css + files.js;
+  let pass=false;
+  let message='';
+  const v = lesson.validator||'';
+
+  if(v==='h1') pass=files.html.includes('<h1>')&&files.html.includes('</h1>')&&files.html.replace(/<[^>]*>/g,'').trim().length>2;
+  else if(v==='p') pass=files.html.includes('<p>')&&files.html.includes('<a');
+  else if(v==='box-shadow') pass=files.css.includes('box-shadow');
+  else if(v==='card') pass=files.css.includes('margin')&&files.html.toLowerCase().includes('card');
+  else if(v==='link') pass=files.css.includes(':hover')&&files.css.includes('ff7200');
+  else if(v==='player') pass=files.css.includes('#play')&&/background\s*:\s*#ff7200/i.test(files.css)&&/width\s*:\s*50px/i.test(files.css)&&/height\s*:\s*50px/i.test(files.css);
+  else if(v==='clipboard') pass=files.js.includes('clipboard')&&files.js.includes('writeText');
+  else if(v==='canvas') pass=files.js.includes('getContext')&&files.js.includes('ctx.moveTo')&&files.js.includes('ctx.lineTo')&&files.js.includes('ctx.stroke');
+  else if(v==='profile') pass=files.html.includes('profile')&&/\.links\s+a:hover/i.test(files.css);
+  else if(v==='grid') pass=/grid-template-columns\s*:\s*repeat\(\s*auto-fit/i.test(files.css)&&/minmax\s*\(/i.test(files.css);
+  else if(v==='form-validation') pass=/event\.preventDefault\s*\(/.test(files.js)&&/status\.textContent\s*=/.test(files.js);
+  else if(v==='storage') pass=/(^|\n)\s*localStorage\.getItem\s*\(/.test(files.js)&&/(^|\n)\s*localStorage\.setItem\s*\(/.test(files.js)&&/classList\.toggle\s*\(/.test(files.js);
+  else if(v==='semantic') pass=/<nav\b/i.test(files.html)&&/aria-label\s*=\s*["']main navigation["']/i.test(files.html)&&/<ul\b/i.test(files.html);
+  else if(v==='dom') pass=/addEventListener\s*\(\s*["']click["']/.test(files.js)&&/count\s*\+=\s*1/.test(files.js)&&/textContent\s*=/.test(files.js);
+  else if(v==='css-vars') pass=/:root\s*\{/.test(files.css)&&/--accent\s*:/.test(files.css)&&/var\(\s*--accent\s*\)/.test(files.css);
+  else if(v==='deploy') pass=true;
+  else if(v==='teach') pass=true;
+  else pass=files.html.length>10;
+
+  if(pass){
+    const progress = JSON.parse(localStorage.getItem('ukid_progress')||'[]');
+    if(!progress.includes(lessonId)){
+      progress.push(lessonId);
+      localStorage.setItem('ukid_progress', JSON.stringify(progress));
+      const xpDiv = document.createElement('div');
+      xpDiv.className='xp-float';
+      xpDiv.innerHTML='<i class="fas fa-fire"></i> +100 XP';
+      document.body.appendChild(xpDiv);
+      setTimeout(()=>xpDiv.remove(), 3000);
+    }
+    message=`<div style="color:#00e676; font-weight:700;"><i class="fas fa-check-circle"></i> Lesson Complete! +100 XP</div>
+    <div style="margin-top:12px; background:#ff7200; color:#000; padding:12px; border-radius:8px; font-weight:700; text-align:center;">
+    🎉 ${progress.length}/${IDS.length} done - ${progress.length*100} XP
+    <button onclick="nextLesson()" style="margin-top:10px; background:#000; color:#ff7200; border:none; padding:10px 18px; border-radius:6px; cursor:pointer; width:100%; font-weight:800;"><i class="fas fa-arrow-right"></i> Next Lesson →</button>
+    <a href="courses.html" style="display:block; margin-top:8px; color:#000; font-size:11px; text-decoration:none;">Back to Courses</a>
+    </div>`;
+  } else {
+    message=`<div style="color:#ff5252;"><i class="fas fa-times-circle"></i> Not yet - check task</div>
+    <div style="color:#888; font-size:12px; margin-top:8px; white-space:pre-wrap; background:#1a1a1a; padding:10px; border-radius:6px; border:1px solid #222;">${escapeHtml(lesson.task||'')}</div>
+    <button onclick="askAI()" style="margin-top:10px; background:#1e1e1e; border:1px solid #2a2a2a; color:#ff7200; padding:6px 12px; border-radius:6px; cursor:pointer; font-size:12px; width:100%;"><i class="fas fa-robot"></i> Need hint?</button>`;
+  }
+  document.getElementById('tests').innerHTML=message;
+};
+
+window.askAI=()=>{
+  const hints={
+    html:'Use opening <h1> and closing </h1>. Inside is your content. Example: <h1>Ukid</h1>',
+    css:'CSS format is property: value; Example: color: #ff7200; For glow, use box-shadow: 0 0 20px #ff7200;',
+    js:'For copy: document.getElementById("username").innerText gets text. navigator.clipboard.writeText(text) copies it.'
+  };
+  const hint = hints[current] || 'Follow the task step by step! Check spelling and brackets.';
+  document.getElementById('ai-text').innerText=hint + '\n\nTask:\n' + lesson.task;
+};
+
+function escapeHtml(value){
+  return String(value).replace(/[&<>"']/g,char=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[char]));
+}
+
+window.nextLesson=()=>{
+  let idx=IDS.indexOf(lessonId);
+  if(idx<IDS.length-1) location.href=`academy.html?lesson=${IDS[idx+1]}`;
+  else { alert(`🎉 You finished all ${IDS.length} lessons! Go build your template!`); location.href='courses.html'; }
+};
+window.prevLesson=()=>{
+  let idx=IDS.indexOf(lessonId);
+  if(idx>0) location.href=`academy.html?lesson=${IDS[idx-1]}`;
+  else location.href='courses.html';
+};
+
+loadLesson();
+</script>
+<script src="pwa.js" defer></script>
+</body>
+</html>

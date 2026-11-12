@@ -1,0 +1,82 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Contact | Ukid Studio</title>
+<meta name="description" content="Contact Ukid Studio with questions, feedback, bug reports, or partnership ideas.">
+<meta name="theme-color" content="#0b0e14">
+<link rel="manifest" href="manifest.json">
+<link rel="icon" href="CodeVault%20Coding%20Templates%20Logo.png" type="image/png">
+<script src="pwa.js" defer></script>
+<link rel="stylesheet" href="dashboard.css">
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css"/>
+<style>
+.contact-wrap{max-width:1000px;margin:40px auto;padding:0 20px;display:grid;grid-template-columns:1fr 1.2fr;gap:24px}
+.contact-info h1{font-size:36px;font-weight:800;margin-bottom:12px;letter-spacing:-0.02em}.contact-info h1 span{color:#ff7200}
+.contact-info p{color:#777;font-size:13px;line-height:1.6;margin-bottom:20px}
+.info-card{display:flex;gap:12px;background:#101010;border:1px solid rgba(255,255,255,0.07);border-radius:12px;padding:14px;margin-bottom:10px}
+.info-card i{width:36px;height:36px;background:#1a1a1a;border-radius:8px;display:grid;place-items:center;color:#ff7200;flex-shrink:0}
+.info-card strong{font-size:12px;display:block}.info-card small{font-size:11px;color:#777}
+.form-card{background:#101010;border:1px solid rgba(255,255,255,0.07);border-radius:16px;padding:22px}
+.form-card label{font-size:11px;font-weight:600;color:#ccc;display:block;margin:12px 0 6px}
+.form-card input,.form-card textarea,.form-card select{width:100%;padding:11px 12px;border-radius:9px;background:#080808;border:1px solid rgba(255,255,255,0.07);color:#fff;outline:none;font-size:13px;font-family:Poppins}
+.form-card input:focus,.form-card textarea:focus{border-color:rgba(255,114,0,0.4)}
+.form-card textarea{resize:vertical;min-height:110px;font-family:Poppins}
+@media(max-width:800px){.contact-wrap{grid-template-columns:1fr}}
+</style>
+</head>
+<body style="background:#0b0e14;color:#f4f6fb">
+<header class="dashboard-topbar">
+  <div class="topbar-left"><a href="/" class="sidebar-brand"><img class="brand-mark" src="CodeVault%20Coding%20Templates%20Logo.png" alt=""><span class="brand-text"><strong>Ukid<span>.</span></strong><small>Studio</small></span></a></div>
+  <div class="topbar-actions"><a href="about.html" style="color:#888;text-decoration:none;font-size:12px">About</a><a href="templates.html" class="primary-btn"><i class="fas fa-layer-group"></i> Templates</a></div>
+</header>
+
+<div class="contact-wrap">
+  <div class="contact-info">
+    <h1>Let's talk <span>code</span></h1>
+    <p>Have a template idea? Found a bug? Want to partner with Ukid Studio? Send us a message and we reply within 24h.</p>
+    <div class="info-card"><i class="fas fa-envelope"></i><div><strong>Email Us</strong><small>ukidsa44@gmail.com</small></div></div>
+    <div class="info-card"><i class="fas fa-map-marker-alt"></i><div><strong>Pretoria, South Africa</strong><small>GMT+2 • Remote team</small></div></div>
+    <div class="info-card"><i class="fas fa-bolt"></i><div><strong>Response Time</strong><small>Average 3 hours during business hours</small></div></div>
+    <a href="mailto:ukidsa44@gmail.com" style="display:inline-flex;align-items:center;gap:8px;margin-top:8px;color:#ff7200;font-size:12px;text-decoration:none"><i class="fas fa-envelope"></i> Email Ukid Studio</a>
+  </div>
+
+  <div class="form-card">
+    <h3 style="font-size:16px;margin-bottom:4px">Send a message</h3><p style="font-size:11px;color:#777;margin-bottom:16px">We read every message</p>
+    <label>Full Name</label><input type="text" id="cName" placeholder="Your name">
+    <label>Email Address</label><input type="email" id="cEmail" placeholder="you@example.com">
+    <label>Topic</label><select id="cTopic"><option>General Question</option><option>Bug Report</option><option>Feature Request</option><option>Template Removal</option><option>Partnership</option></select>
+    <label>Message</label><textarea id="cMessage" placeholder="How can we help?"></textarea>
+    <div aria-hidden="true" style="position:absolute;left:-10000px;width:1px;height:1px;overflow:hidden"><label for="cWebsite">Website</label><input type="text" id="cWebsite" name="website" tabindex="-1" autocomplete="off"></div>
+    <button class="primary-btn large" style="width:100%;justify-content:center;margin-top:16px" id="sendBtn"><i class="fas fa-paper-plane"></i> Send Message</button>
+    <p style="font-size:10px;color:#555;text-align:center;margin-top:10px">By sending, you agree to our Privacy Policy</p>
+  </div>
+</div>
+
+<div class="dashboard-toast" id="toast"></div>
+<script type="module">
+import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-app.js";
+import { firebaseConfig } from "./firebase-config.js";
+const app = initializeApp(firebaseConfig);
+function toast(m){const t=document.getElementById('toast');t.textContent=m;t.classList.add('show');setTimeout(()=>t.classList.remove('show'),3000)}
+document.getElementById('sendBtn').onclick=async()=>{
+  const name=document.getElementById('cName').value.trim();
+  const email=document.getElementById('cEmail').value.trim();
+  const topic=document.getElementById('cTopic').value;
+  const message=document.getElementById('cMessage').value.trim();
+  const website=document.getElementById('cWebsite').value.trim();
+  if(!name||!email||!message){toast('Fill all fields');return}
+  const btn=document.getElementById('sendBtn');btn.innerHTML='<i class="fas fa-spinner fa-spin"></i> Sending...';btn.disabled=true;
+  try{
+    const response=await fetch('/api/contact',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({name,email,topic,message,website})});
+    const result=await response.json();
+    if(!response.ok) throw new Error(result.error||'Unable to send your message.');
+    toast('Message sent! We will reply soon');
+    document.getElementById('cName').value='';
+    document.getElementById('cEmail').value='';
+    document.getElementById('cMessage').value='';
+  }catch(e){toast(e.message)}finally{btn.innerHTML='<i class="fas fa-paper-plane"></i> Send Message';btn.disabled=false}
+}
+</script>
+</body>
+</html>

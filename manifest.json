@@ -1,0 +1,27 @@
+{
+  "id": "./",
+  "name": "Ukid Studio",
+  "short_name": "Ukid",
+  "description": "Learn to code, build projects, and share developer templates with Ukid Studio.",
+  "start_url": "./",
+  "scope": "./",
+  "display": "standalone",
+  "orientation": "any",
+  "background_color": "#0b0e14",
+  "theme_color": "#ff8738",
+  "categories": ["education", "productivity"],
+  "icons": [
+    {
+      "src": "ukid-icon-192.png",
+      "sizes": "192x192",
+      "type": "image/png",
+      "purpose": "any"
+    },
+    {
+      "src": "ukid-icon-512.png",
+      "sizes": "512x512",
+      "type": "image/png",
+      "purpose": "any"
+    }
+  ]
+}

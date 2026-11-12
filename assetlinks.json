@@ -1,0 +1,8 @@
+[{
+      "relation": ["delegate_permission/common.handle_all_urls"],
+      "target": {
+        "namespace": "android_app",
+        "package_name": "app.netlify.ukid.twa",
+        "sha256_cert_fingerprints": ["77:B7:D6:33:76:5F:89:BC:7F:EB:9F:69:BB:BB:50:5F:71:31:C5:AE:D3:6B:AA:C1:C5:C1:56:5A:EF:3C:60:41"]
+      }
+    }]

@@ -1,0 +1,140 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>All Templates | Ukid.</title>
+<meta name="description" content="Browse, preview, and share reusable coding templates with the Ukid developer community.">
+<meta name="theme-color" content="#0b0e14">
+<link rel="manifest" href="manifest.json">
+<link rel="icon" href="CodeVault%20Coding%20Templates%20Logo.png" type="image/png">
+<script src="pwa.js" defer></script>
+
+<link rel="stylesheet" href="dashboard.css">
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css"/>
+<style>
+.premium-badge{background:linear-gradient(135deg,#ff7200,#ff9f43);color:#fff;font-size:10px;padding:3px 8px;border-radius:20px;font-weight:700;margin-left:6px}
+.locked-overlay{position:absolute;inset:0;background:rgba(0,0,0,0.85);backdrop-filter:blur(8px);display:flex;flex-direction:column;align-items:center;justify-content:center;border-radius:12px;z-index:2}
+.unlock-btn{background:#ff7200;color:#fff;border:none;padding:8px 16px;border-radius:20px;font-weight:600;cursor:pointer;margin-top:8px}
+.admin-only{display:none!important}
+.admin-only.show{display:block!important; display:flex!important}
+.premium-card{border:1px solid rgba(255,114,0,0.4)!important}
+.ad-wrap{display:flex;align-items:center;justify-content:space-between;gap:20px;margin:0 0 20px;padding:18px 20px;background:linear-gradient(110deg,#17120e,#101010 70%);border:1px solid rgba(255,114,0,.2);border-radius:8px}
+.ad-copy{display:grid;gap:4px}.ad-label{color:#ff9a4a;font-size:9px;font-weight:700;letter-spacing:1.2px;text-transform:uppercase}.ad-copy strong{font-size:13px;color:#f4eee8}.ad-copy p{font-size:11px;color:#999}.ad-link{white-space:nowrap;text-decoration:none}
+@media(max-width:600px){.ad-wrap{align-items:flex-start;flex-direction:column;gap:12px;padding:16px}.ad-link{width:100%;justify-content:center}}
+</style>
+</head>
+<body class="dashboard-page">
+<div class="app-shell">
+<div class="sidebar-overlay" id="sidebarOverlay2"></div>
+<aside class="dashboard-sidebar" id="dashboardSidebar2">
+  <div class="sidebar-top">
+    <a href="/" class="sidebar-brand"><img class="brand-mark" src="CodeVault%20Coding%20Templates%20Logo.png" alt=""><span class="brand-text"><strong>Ukid<span>.</span></strong><small>Studio</small></span></a>
+    <button class="mobile-close" id="mobileClose2">×</button>
+  </div>
+  <div class="sidebar-user-card"><img id="userAvatar" src="https://ui-avatars.com/api/?name=U&background=ff7200&color=fff"><div><strong id="userName">Creator</strong><small id="userCount">Loading...</small></div></div>
+  <nav class="sidebar-nav">
+    <p class="nav-label">Workspace</p>
+    <a class='nav-item' href='dashboard.html'><i class="fas fa-th-large nav-icon"></i> <span>Overview</span></a>
+    <a class='nav-item active' href='templates.html'><i class="fas fa-layer-group nav-icon"></i> <span>Community</span><span class="nav-count" id="totalCount">0</span></a>
+    <a class='nav-item' href='my-templates.html'><i class="fas fa-user nav-icon"></i> <span>My Templates</span></a>
+  </nav>
+  <div class="sidebar-bottom"><div class="upgrade-card"><h4><i class="fas fa-plus"></i> Share your code</h4><p>Publish publicly and help others</p><button class="primary-btn" id="openCreateBtn" style="width:100%;justify-content:center"><i class="fas fa-plus"></i> Create Template</button></div></div>
+</aside>
+
+<main class="dashboard-main">
+  <header class="dashboard-topbar">
+    <div class="topbar-left"><button class="mobile-menu" id="mobileMenu2"><i class="fas fa-bars"></i></button><div><p class="eyebrow" id="libEyebrow">Community Library</p><h1>All Templates <span id="livePublicCount" style="font-size:12px;color:#ff7200;font-weight:600;margin-left:8px"></span></h1></div></div>
+    <div class="topbar-actions">
+      <div class="global-search"><i class="fas fa-search"></i><input type="search" id="templatesSearch" placeholder="Search community..."></div>
+      <button class="primary-btn" id="createTemplateBtn"><i class="fas fa-plus"></i> Create</button>
+    </div>
+  </header>
+
+  <div class="dashboard-content">
+    <aside class="ad-wrap" aria-label="Sponsored offer">
+      <div class="ad-copy"><span class="ad-label">Sponsored</span><strong>Support Ukid Studio</strong><p>Explore a sponsored offer. Opening it is optional.</p></div>
+      <a class="primary-btn ad-link" href="https://arwf.org/4/074750c901b9e88f05fb7d8db220f331" target="_blank" rel="sponsored noopener noreferrer">Visit sponsor <i class="fas fa-arrow-up-right-from-square" aria-hidden="true"></i></a>
+    </aside>
+    <div class="filter-row">
+      <div class="categories">
+        <button class="category-btn active" data-filter="all">All</button>
+        <button class="category-btn" data-filter="html">HTML</button>
+        <button class="category-btn" data-filter="css">CSS</button>
+        <button class="category-btn" data-filter="js">JavaScript</button>
+        <button class="category-btn" data-filter="tailwind">Tailwind</button>
+        <button class="category-btn" data-filter="react">React</button>
+        <button class="category-btn" data-filter="premium"><i class="fas fa-crown"></i> Premium</button>
+      </div>
+      <select id="sortSelect" class="sort-select"><option value="newest">Newest First</option><option value="popular">Most Copied</option><option value="my">My Templates Only</option></select>
+    </div>
+
+    <p class="result-text" id="resultText">Loading community templates...</p>
+    <div class="templates" id="allTemplatesGrid"></div>
+  </div>
+</main>
+</div>
+
+<!-- CREATE MODAL -->
+<div class="modal-backdrop" id="createModal">
+  <div class="modal create-modal">
+    <button class="modal-close" id="closeCreate">×</button>
+    <h2><i class="fas fa-code" style="color:#ff7200"></i> Create Template</h2>
+    <p class="modal-sub">Share your snippet with the community</p>
+    <label>Template Title<input type="text" id="tTitle" placeholder="e.g. Glass Card with Blur"></label>
+    <div class="row-2"><label>Category<select id="tCategory"><option value="html">HTML</option><option value="css">CSS</option><option value="js">JavaScript</option><option value="tailwind">Tailwind</option><option value="react">React</option><option value="forms">Forms</option><option value="layout">Layout</option><option value="landing">Landing</option></select></label><label>Language<select id="tLang"><option value="html">HTML</option><option value="css">CSS</option><option value="js">JavaScript</option><option value="tailwind">Tailwind (HTML)</option><option value="react">React (JSX)</option></select></label></div>
+    <label>Description<input type="text" id="tDesc" placeholder="What does this snippet do?"></label>
+    <label>Code<textarea id="tCode" rows="8" placeholder="Paste your code here..."></textarea></label>
+    
+    <div class="publish-row">
+      <label class="switch-label"><input type="checkbox" id="tPublic" checked><span class="switch"></span><div><strong>Publish Publicly</strong><small>Everyone can see and copy this template</small></div></label>
+      <span class="public-badge"><i class="fas fa-globe"></i> Public</span>
+    </div>
+
+    <div id="premiumCreateRow" class="admin-only" style="margin-top:12px; padding:12px; background:#fff7ed; border:1px dashed #ff7200; border-radius:10px; flex-direction:row!important; gap:10px; align-items:center">
+      <label class="switch-label" style="margin:0; flex:1"><input type="checkbox" id="tPremium"><span class="switch"></span><div><strong><i class="fas fa-crown" style="color:#ff7200"></i> Make Premium</strong><small>Users watch ad to unlock - you earn</small></div></label>
+    </div>
+
+    <button class="primary-btn large" id="saveTemplateBtn" style="width:100%;justify-content:center;margin-top:14px"><i class="fas fa-upload"></i> Publish Template</button>
+    <p class="modal-hint">Private templates are only visible to you</p>
+  </div>
+</div>
+
+<!-- PREVIEW MODAL -->
+<div class="modal-backdrop" id="previewModal">
+  <div class="modal preview-modal-large">
+    <div class="preview-header"><div class="preview-tabs"><span class="dot red"></span><span class="dot yellow"></span><span class="dot green"></span><small id="previewTitle">Live Preview</small><span id="previewAuthor" style="margin-left:10px;color:#ff7200;font-size:11px"></span><span id="previewPremiumBadge"></span></div><div class="preview-actions"><button class="btn-sm" id="openNewTab"><i class="fas fa-external-link-alt"></i> New Tab</button><button class="modal-close" id="closePreview">×</button></div></div>
+    <iframe id="previewFrame" class="preview-iframe" sandbox="allow-scripts allow-same-origin"></iframe>
+    <div class="preview-footer"><div class="preview-meta"><span id="previewMetaCat"></span><span id="previewMetaDate"></span></div><button class="btn copy-btn" id="copyFromPreview"><i class="fas fa-copy"></i> Copy Code</button></div>
+  </div>
+</div>
+
+<!-- PREMIUM TEMPLATE NOTICE -->
+<div class="modal-backdrop" id="premiumModal">
+  <div class="modal" style="text-align:center;max-width:360px">
+    <button class="modal-close" id="closePremium">×</button>
+    <div style="font-size:40px;color:#ff7200;margin-bottom:12px"><i class="fas fa-crown"></i></div>
+    <h2>Premium Template</h2>
+    <p class="modal-sub">This template is premium and cannot be unlocked by clicking an advertisement. Free templates remain available in the community library.</p>
+    <a class="primary-btn large" href="https://arwf.org/4/074750c901b9e88f05fb7d8db220f331" target="_blank" rel="sponsored noopener noreferrer" style="width:100%;justify-content:center">Visit sponsor <i class="fas fa-arrow-up-right-from-square" aria-hidden="true"></i></a>
+  </div>
+</div>
+
+<div class="dashboard-toast" id="toast"></div>
+
+<script type="module">
+window.isAdmin = false;
+window.checkAdmin = (isAdmin) => {
+  window.isAdmin = isAdmin;
+  document.querySelectorAll('.admin-only').forEach(el => {
+    if(isAdmin) { el.classList.add('show'); el.style.display = 'flex'; }
+    else { el.classList.remove('show'); el.style.display = 'none'; }
+  });
+  const row = document.getElementById('premiumCreateRow');
+  if(row) row.style.display = isAdmin ? 'flex' : 'none';
+};
+</script>
+
+<script type="module" src="templates.js"></script>
+</body>
+</html>

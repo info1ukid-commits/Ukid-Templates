@@ -1,0 +1,986 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="theme-color" content="#111318">
+  <meta name="description" content="A browser-based coding workspace with an Ollama AI assistant.">
+  <link rel="manifest" href="manifest.json">
+  <link rel="icon" href="CodeVault%20Coding%20Templates%20Logo.png" type="image/png">
+  <script src="pwa.js" defer></script>
+  <title>Code Workspace | Ukid Studio</title>
+  <style>
+    :root {
+      color-scheme: dark;
+      --bg: #1e1f22;
+      --panel: #18191c;
+      --panel2: #25262b;
+      --panel3: #2b2d32;
+      --line: #34363c;
+      --text: #e6e7eb;
+      --muted: #9da1aa;
+      --accent: #ff913f;
+      --blue: #70a7ff;
+      --green: #67d49b;
+      --red: #ff737d;
+      font: 13px/1.5 "Segoe UI", Inter, system-ui, sans-serif;
+    }
+    * { box-sizing: border-box; }
+    html, body { height: 100%; margin: 0; overflow: hidden; background: var(--bg); color: var(--text); }
+    button, input, textarea { font: inherit; }
+    button { color: inherit; cursor: pointer; }
+    button:disabled { cursor: wait; opacity: .58; }
+    button:focus-visible, input:focus-visible, textarea:focus-visible { outline: 2px solid var(--blue); outline-offset: 1px; }
+    .app { display: grid; grid-template-rows: 36px minmax(0, 1fr) 24px; height: 100%; }
+    .titlebar { display: flex; align-items: center; justify-content: space-between; gap: 12px; padding: 0 12px; background: #18191c; border-bottom: 1px solid #111; }
+    .brand { display: flex; align-items: center; gap: 8px; color: var(--text); font-weight: 650; text-decoration: none; }
+    .brand img { width: 20px; height: 20px; object-fit: contain; border-radius: 4px; }
+    .title-actions, .toolbar, .status-left, .status-right { display: flex; align-items: center; gap: 8px; }
+    .titlebar button, .toolbar button, .icon-btn, .panel-tab, .activity-btn {
+      border: 0; background: transparent; color: var(--muted); border-radius: 4px;
+    }
+    .titlebar button { padding: 4px 8px; font-size: 12px; }
+    .titlebar button:hover, .toolbar button:hover, .icon-btn:hover, .panel-tab:hover { background: var(--panel3); color: var(--text); }
+    .title-actions a { color: var(--muted); text-decoration: none; padding: 4px 8px; }
+    .title-actions a:hover { color: var(--text); }
+    .workbench { display: grid; grid-template-columns: 48px 224px minmax(300px, 1fr) 320px; min-height: 0; }
+    .activity { display: flex; flex-direction: column; align-items: center; gap: 8px; padding: 10px 0; background: var(--panel); border-right: 1px solid var(--line); }
+    .activity-btn { width: 40px; height: 40px; font-size: 19px; }
+    .activity-btn.active { color: var(--text); border-left: 2px solid var(--accent); border-radius: 0; }
+    .explorer { min-width: 0; overflow: auto; background: var(--panel); border-right: 1px solid var(--line); }
+    .section-heading { height: 38px; display: flex; align-items: center; justify-content: space-between; padding: 0 12px; font-size: 11px; font-weight: 700; letter-spacing: .08em; }
+    .section-heading .icon-btn { width: 26px; height: 26px; font-size: 17px; }
+    .folder-heading { padding: 8px 10px 6px; color: #d7d9de; font-size: 11px; font-weight: 700; letter-spacing: .04em; }
+    .file-tree { padding: 2px 6px 12px; }
+    .tree-file { display: flex; align-items: center; gap: 7px; width: 100%; min-height: 27px; padding: 3px 7px; border: 0; border-radius: 3px; background: transparent; color: #c4c6cc; text-align: left; }
+    .tree-file:hover { background: #2a2c31; }
+    .tree-file.active { background: #34363d; color: #fff; }
+    .file-icon { width: 16px; flex: 0 0 16px; color: var(--blue); text-align: center; }
+    .tree-name { min-width: 0; flex: 1; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+    .tree-actions { display: none; gap: 1px; }
+    .tree-file:hover .tree-actions, .tree-file.active .tree-actions { display: flex; }
+    .tree-actions button { padding: 0 3px; border: 0; background: transparent; color: var(--muted); font-size: 13px; }
+    .editor-column { display: grid; grid-template-rows: 36px 36px minmax(140px, 1fr) 34px minmax(120px, .75fr); min-width: 0; min-height: 0; }
+    .editor-toolbar { display: flex; align-items: center; justify-content: space-between; gap: 8px; padding: 0 10px; background: var(--panel); border-bottom: 1px solid var(--line); }
+    .toolbar { min-width: 0; }
+    .toolbar button { padding: 4px 8px; font-size: 12px; }
+    .project-name { max-width: 200px; overflow: hidden; color: #c4c6cc; text-overflow: ellipsis; white-space: nowrap; }
+    .saved-state { color: var(--green); font-size: 11px; }
+    .tabs { display: flex; gap: 1px; min-width: 0; overflow: auto; background: #1b1c20; border-bottom: 1px solid var(--line); }
+    .editor-tab { display: flex; align-items: center; gap: 8px; min-width: max-content; padding: 0 12px; border: 0; border-right: 1px solid var(--line); background: #222328; color: var(--muted); }
+    .editor-tab.active { background: var(--bg); color: var(--text); border-top: 1px solid var(--accent); }
+    .tab-close { color: #858992; font-size: 15px; }
+    .editor-host { position: relative; min-width: 0; min-height: 0; }
+    #editor { position: absolute; inset: 0; }
+    #editorFallback { position: absolute; inset: 0; display: none; width: 100%; height: 100%; resize: none; padding: 14px; border: 0; background: #1e1f22; color: var(--text); font: 13px/1.55 Consolas, monospace; tab-size: 2; }
+    .panel-heading { display: flex; align-items: center; justify-content: space-between; padding: 0 12px; background: var(--panel); border-top: 1px solid var(--line); border-bottom: 1px solid var(--line); }
+    .panel-tabs { display: flex; height: 100%; gap: 16px; }
+    .panel-tab { position: relative; padding: 0 2px; font-size: 11px; }
+    .panel-tab.active { color: var(--text); }
+    .panel-tab.active::after { position: absolute; right: 0; bottom: -1px; left: 0; height: 1px; background: var(--accent); content: ""; }
+    #preview { width: 100%; height: 100%; border: 0; background: #fff; }
+    .preview-area { min-height: 0; background: #fff; }
+    .output-area { display: none; min-height: 0; overflow: auto; padding: 10px 14px; background: #1b1c20; color: #b7bbc4; font: 12px/1.6 Consolas, monospace; white-space: pre-wrap; }
+    .assistant { display: grid; grid-template-rows: 42px 1fr auto auto; min-width: 0; min-height: 0; background: #1b1c20; border-left: 1px solid var(--line); }
+    .assistant-header { display: flex; align-items: center; justify-content: space-between; gap: 10px; padding: 0 12px; border-bottom: 1px solid var(--line); font-weight: 650; }
+    .assistant-title { display: flex; align-items: center; gap: 8px; }
+    .ai-dot { width: 8px; height: 8px; border-radius: 50%; background: var(--green); box-shadow: 0 0 8px #67d49b80; }
+    #modelSelect { max-width: 168px; padding: 5px 6px; border: 1px solid var(--line); border-radius: 4px; background: #25262b; color: var(--text); font-size: 11px; }
+    .chat-messages { overflow: auto; padding: 12px; }
+    .empty-chat { max-width: 250px; margin: 18px auto; color: var(--muted); text-align: center; }
+    .empty-chat strong { display: block; margin-bottom: 7px; color: var(--text); font-size: 14px; }
+    .chat-message { margin: 0 0 12px; padding: 10px; border: 1px solid var(--line); border-radius: 7px; background: #222328; overflow-wrap: anywhere; }
+    .chat-message.user { background: #292a30; }
+    .chat-role { margin-bottom: 5px; color: var(--accent); font-size: 10px; font-weight: 750; letter-spacing: .06em; text-transform: uppercase; }
+    .chat-content { white-space: pre-wrap; line-height: 1.55; }
+    .edit-card { margin-top: 9px; padding: 9px; border: 1px solid #41434b; border-radius: 6px; background: #191a1e; }
+    .edit-card button { margin-top: 7px; padding: 5px 9px; border: 1px solid #555861; border-radius: 4px; background: #30323a; }
+    .edit-card button:hover { border-color: var(--accent); }
+    .chat-status { min-height: 24px; padding: 0 12px; color: var(--muted); font-size: 11px; }
+    .chat-status.error { color: var(--red); }
+    .chat-form { display: grid; gap: 8px; padding: 10px; border-top: 1px solid var(--line); }
+    #chatInput { min-height: 82px; max-height: 200px; resize: vertical; padding: 9px; border: 1px solid #41434b; border-radius: 5px; background: #25262b; color: var(--text); }
+    .chat-form-footer { display: flex; align-items: center; justify-content: space-between; gap: 8px; }
+    .context-toggle { display: flex; align-items: center; gap: 5px; color: var(--muted); font-size: 10px; }
+    .primary-btn { padding: 6px 12px; border: 0; border-radius: 4px; background: var(--accent); color: #20150d; font-weight: 700; }
+    .primary-btn:hover { background: #ffab66; }
+    .statusbar { display: flex; align-items: center; justify-content: space-between; gap: 12px; padding: 0 10px; background: #214e83; color: #fff; font-size: 11px; }
+    .status-left, .status-right { gap: 14px; }
+    .statusbar button { border: 0; background: transparent; color: inherit; font-size: 11px; }
+    .hidden-input { display: none; }
+    @media(max-width:1050px) {
+      .workbench { grid-template-columns: 42px 190px minmax(280px, 1fr); }
+      .assistant { position: fixed; z-index: 4; top: 36px; right: 0; bottom: 24px; width: min(360px, 88vw); box-shadow: -10px 0 30px #0008; }
+      .assistant.collapsed { display: none; }
+    }
+    @media(max-width:650px) {
+      .workbench { grid-template-columns: 38px minmax(0, 1fr); }
+      .explorer { display: none; }
+      .editor-column { grid-column: 2; grid-row: 1; }
+      .title-actions a { display: none; }
+      .project-name { max-width: 100px; }
+      .status-right { display: none; }
+      .editor-column { grid-template-rows: 36px 36px minmax(180px, 1fr) 34px minmax(140px, .7fr); }
+    }
+  </style>
+</head>
+<body>
+  <div class="app">
+    <header class="titlebar">
+      <a class="brand" href="index.html">
+        <img src="ukid-icon-192.png" alt="">
+        <span>Ukid Studio</span>
+      </a>
+      <div class="title-actions">
+        <span class="project-name" id="titleProjectName">My Workspace</span>
+        <a href="index.html?returnTo=%2Flearn-workspace.html#login">Sign in</a>
+        <button id="openFolderBtn" type="button">Open Folder</button>
+        <button id="saveBtn" type="button" title="Save workspace (Ctrl+S)">Save</button>
+        <button id="importBtn" type="button">Import</button>
+        <button id="exportBtn" type="button">Export</button>
+        <a href="academy.html">Academy</a>
+      </div>
+    </header>
+
+    <main class="workbench">
+      <nav class="activity" aria-label="Workspace panels">
+        <button class="activity-btn active" id="explorerToggle" type="button" title="Explorer">▤</button>
+        <button class="activity-btn" id="assistantToggle" type="button" title="Ollama AI assistant">✳</button>
+      </nav>
+
+      <aside class="explorer" id="explorer">
+        <div class="section-heading">
+          <span>EXPLORER</span>
+          <span>
+            <button class="icon-btn" id="newFileBtn" type="button" title="New file">＋</button>
+            <button class="icon-btn" id="workspaceMenuBtn" type="button" title="New workspace">⌄</button>
+          </span>
+        </div>
+        <div class="folder-heading" id="folderHeading">⌄ &nbsp; UKID-WORKSPACE</div>
+        <div class="file-tree" id="fileTree" role="tree"></div>
+      </aside>
+
+      <section class="editor-column" aria-label="Code workspace">
+        <div class="editor-toolbar">
+          <div class="toolbar">
+            <span class="project-name" id="projectName">My Workspace</span>
+            <button id="renameProjectBtn" type="button" title="Rename workspace">✎</button>
+          </div>
+          <div class="toolbar">
+            <span class="saved-state" id="saveState" role="status">Saved locally</span>
+            <button id="runBtn" class="primary-btn" type="button" title="Run preview (Ctrl+Enter)">Run ▶</button>
+          </div>
+        </div>
+        <div class="tabs" id="editorTabs" role="tablist" aria-label="Open files"></div>
+        <div class="editor-host">
+          <div id="editor" aria-label="Monaco code editor"></div>
+          <textarea id="editorFallback" spellcheck="false" aria-label="Code editor"></textarea>
+        </div>
+        <div class="panel-heading">
+          <div class="panel-tabs">
+            <button class="panel-tab active" id="previewTab" type="button">PREVIEW</button>
+            <button class="panel-tab" id="outputTab" type="button">OUTPUT</button>
+          </div>
+          <div class="toolbar"><button id="refreshPreviewBtn" type="button" title="Refresh preview">↻</button></div>
+        </div>
+        <div class="preview-area" id="previewArea"><iframe id="preview" title="Workspace preview" sandbox="allow-scripts allow-forms"></iframe></div>
+        <pre class="output-area" id="outputArea" aria-live="polite">Workspace output appears here. Run your HTML app to preview it.</pre>
+      </section>
+
+      <aside class="assistant" id="assistantPanel">
+        <div class="assistant-header">
+          <span class="assistant-title"><span class="ai-dot"></span> Ollama Assistant</span>
+          <select id="modelSelect" aria-label="Ollama model" disabled><option>Checking models…</option></select>
+        </div>
+        <div class="chat-messages" id="chatMessages" aria-live="polite">
+          <div class="empty-chat" id="emptyChat"><strong>Ask Ollama about your code</strong>AI assistance is powered by Ollama. Ask a question or request a code change; suggested edits are reviewed before applying.</div>
+        </div>
+        <div class="chat-status" id="chatStatus" role="status">Connecting to Ollama…</div>
+        <form class="chat-form" id="chatForm">
+          <textarea id="chatInput" maxlength="6000" placeholder="Ask Ollama about the open files…" aria-label="Message the Ollama assistant"></textarea>
+          <div class="chat-form-footer">
+            <label class="context-toggle"><input id="includeContext" type="checkbox" checked> Include open files</label>
+            <button class="primary-btn" id="sendBtn" type="submit">Ask Ollama</button>
+          </div>
+        </form>
+      </aside>
+    </main>
+
+    <footer class="statusbar">
+      <div class="status-left"><span id="statusWorkspace">● Workspace</span><span id="statusModel">Ollama</span><span id="statusLine">Ln 1, Col 1</span></div>
+      <div class="status-right"><span id="statusLanguage">HTML</span><button id="toggleAssistantBtn" type="button">Ollama Assistant</button></div>
+    </footer>
+  </div>
+
+  <input class="hidden-input" id="importFileInput" type="file" accept="application/json,.json">
+  <script src="https://cdn.jsdelivr.net/npm/monaco-editor@0.52.2/min/vs/loader.js"></script>
+  <script type="module">
+    import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-app.js";
+    import { getAuth, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-auth.js";
+    import { firebaseConfig } from "./firebase-config.js";
+
+    const $ = (selector) => document.querySelector(selector);
+    const APP_KEY = "ukid-ide-workspace-v1";
+    const MAX_FILES = 100;
+    const MAX_FILE_BYTES = 200_000;
+    const MAX_PROJECT_BYTES = 2_000_000;
+    const LOCAL_WORKSPACE = location.port === "5501"
+      && ["localhost", "127.0.0.1"].includes(location.hostname);
+    const MONACO_BASE = "https://cdn.jsdelivr.net/npm/monaco-editor@0.52.2/min/";
+    const DEFAULT_FILES = {
+      "index.html": "<!doctype html>\n<html lang=\"en\">\n<head>\n  <meta charset=\"utf-8\">\n  <meta name=\"viewport\" content=\"width=device-width, initial-scale=1\">\n  <title>My app</title>\n  <link rel=\"stylesheet\" href=\"style.css\">\n</head>\n<body>\n  <main>\n    <h1>Hello, world!</h1>\n    <p>Start building in your workspace.</p>\n    <button id=\"helloButton\">Try it</button>\n  </main>\n  <script src=\"script.js\"><\\/script>\n</body>\n</html>\n",
+      "style.css": "body {\n  margin: 0;\n  min-height: 100vh;\n  display: grid;\n  place-items: center;\n  background: #f3f5f8;\n  color: #202633;\n  font: 16px/1.5 system-ui, sans-serif;\n}\n\nmain { max-width: 640px; padding: 48px; }\nbutton { padding: 10px 16px; border: 0; border-radius: 8px; background: #ff8738; cursor: pointer; }\n",
+      "script.js": "document.querySelector('#helloButton')?.addEventListener('click', () => {\n  document.querySelector('h1').textContent = 'Your app is running!';\n});\n"
+    };
+    const state = {
+      name: "My Workspace",
+      files: { ...DEFAULT_FILES },
+      openFiles: ["index.html"],
+      activeFile: "index.html",
+      model: "",
+      models: [],
+      chat: [],
+      busy: false,
+      folderHandle: null,
+      editor: null,
+      monacoModels: new Map(),
+      saveTimer: 0,
+      auth: null,
+      authReady: Promise.resolve()
+    };
+
+    function safeFilePath(value) {
+      return typeof value === "string" && value.length <= 240
+        && /^[a-zA-Z0-9_.-][a-zA-Z0-9_./ -]*$/.test(value)
+        && value.split("/").every(part => part && part !== "." && part !== "..");
+    }
+
+    function supportedFile(name) {
+      return /\.(html?|css|[cm]?js|json|md|txt|xml|svg|ya?ml|toml)$/i.test(name);
+    }
+
+    function languageFor(name) {
+      const extension = name.split(".").pop().toLowerCase();
+      return ({ html: "html", htm: "html", css: "css", js: "javascript", mjs: "javascript", cjs: "javascript", json: "json", md: "markdown", xml: "xml", svg: "xml", yml: "yaml", yaml: "yaml", toml: "ini", txt: "plaintext" })[extension] || "plaintext";
+    }
+
+    function setSaveState(value, error = false) {
+      $("#saveState").textContent = value;
+      $("#saveState").style.color = error ? "var(--red)" : "var(--green)";
+    }
+
+    function persist() {
+      try {
+        localStorage.setItem(APP_KEY, JSON.stringify({
+          name: state.name,
+          files: state.files,
+          openFiles: state.openFiles,
+          activeFile: state.activeFile
+        }));
+        $("#titleProjectName").textContent = state.name;
+        $("#projectName").textContent = state.name;
+        $("#folderHeading").innerHTML = `⌄ &nbsp; ${escapeHtml(state.name.toUpperCase())}`;
+        setSaveState("Saved locally");
+      } catch (error) {
+        setSaveState("Could not save", true);
+        logOutput(`Workspace save failed: ${error.message}`);
+      }
+    }
+
+    function scheduleSave() {
+      setSaveState("Saving…");
+      clearTimeout(state.saveTimer);
+      state.saveTimer = setTimeout(persist, 250);
+    }
+
+    function escapeHtml(text) {
+      return String(text).replace(/[&<>"']/g, char => ({
+        "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;"
+      })[char]);
+    }
+
+    function loadWorkspace() {
+      try {
+        const saved = JSON.parse(localStorage.getItem(APP_KEY) || "null");
+        if (!saved || typeof saved !== "object" || !saved.files || typeof saved.files !== "object") return;
+        const files = {};
+        let totalBytes = 0;
+        for (const [name, content] of Object.entries(saved.files).slice(0, MAX_FILES)) {
+          if (!safeFilePath(name) || !supportedFile(name) || typeof content !== "string") continue;
+          const bytes = new TextEncoder().encode(content).length;
+          if (bytes > MAX_FILE_BYTES || totalBytes + bytes > MAX_PROJECT_BYTES) continue;
+          files[name] = content;
+          totalBytes += bytes;
+        }
+        if (Object.keys(files).length) state.files = files;
+        if (typeof saved.name === "string" && saved.name.trim()) state.name = saved.name.slice(0, 80);
+        state.openFiles = Array.isArray(saved.openFiles)
+          ? saved.openFiles.filter(name => Object.hasOwn(state.files, name)).slice(0, MAX_FILES)
+          : [];
+        state.activeFile = state.openFiles.includes(saved.activeFile) ? saved.activeFile : state.openFiles[0];
+      } catch (error) {
+        logOutput(`Saved workspace could not be opened: ${error.message}`);
+      }
+      if (!state.activeFile) {
+        state.openFiles = ["index.html"];
+        state.activeFile = "index.html";
+        if (!state.files["index.html"]) state.files["index.html"] = DEFAULT_FILES["index.html"];
+      }
+    }
+
+    function logOutput(message) {
+      $("#outputArea").textContent += `\n${new Date().toLocaleTimeString()}  ${message}`;
+      $("#outputArea").scrollTop = $("#outputArea").scrollHeight;
+    }
+
+    function setPanel(panel) {
+      const preview = panel === "preview";
+      $("#previewArea").style.display = preview ? "block" : "none";
+      $("#outputArea").style.display = preview ? "none" : "block";
+      $("#previewTab").classList.toggle("active", preview);
+      $("#outputTab").classList.toggle("active", !preview);
+    }
+
+    function renderTree() {
+      const tree = $("#fileTree");
+      tree.replaceChildren();
+      const files = Object.keys(state.files).sort((a, b) => a.localeCompare(b));
+      for (const name of files) {
+        const row = document.createElement("div");
+        row.className = "tree-file" + (name === state.activeFile ? " active" : "");
+        row.setAttribute("role", "treeitem");
+        const icon = document.createElement("span");
+        icon.className = "file-icon";
+        icon.textContent = ({ html: "◇", htm: "◇", css: "#", js: "◈", json: "{}", md: "¶" })[name.split(".").pop().toLowerCase()] || "·";
+        const label = document.createElement("span");
+        label.className = "tree-name";
+        label.textContent = name;
+        const actions = document.createElement("span");
+        actions.className = "tree-actions";
+        const close = document.createElement("button");
+        close.type = "button";
+        close.title = `Remove ${name}`;
+        close.setAttribute("aria-label", `Remove ${name}`);
+        close.textContent = "×";
+        close.addEventListener("click", event => {
+          event.stopPropagation();
+          removeFile(name);
+        });
+        actions.append(close);
+        row.append(icon, label, actions);
+        row.addEventListener("click", () => openFile(name));
+        tree.append(row);
+      }
+      renderTabs();
+    }
+
+    function renderTabs() {
+      const tabs = $("#editorTabs");
+      tabs.replaceChildren();
+      for (const name of state.openFiles) {
+        const tab = document.createElement("button");
+        tab.className = "editor-tab" + (name === state.activeFile ? " active" : "");
+        tab.type = "button";
+        tab.setAttribute("role", "tab");
+        tab.setAttribute("aria-selected", String(name === state.activeFile));
+        const label = document.createElement("span");
+        label.textContent = name;
+        const close = document.createElement("span");
+        close.className = "tab-close";
+        close.textContent = "×";
+        close.title = "Close file";
+        close.addEventListener("click", event => {
+          event.stopPropagation();
+          closeFile(name);
+        });
+        tab.append(label, close);
+        tab.addEventListener("click", () => openFile(name));
+        tabs.append(tab);
+      }
+    }
+
+    function openFile(name) {
+      if (!Object.hasOwn(state.files, name)) return;
+      if (!state.openFiles.includes(name)) state.openFiles.push(name);
+      state.activeFile = name;
+      renderTree();
+      $("#statusLanguage").textContent = languageFor(name).toUpperCase();
+      if (state.editor && window.monaco) {
+        if (!state.monacoModels.has(name)) {
+          const model = window.monaco.editor.createModel(state.files[name], languageFor(name));
+          model.onDidChangeContent(() => {
+            state.files[name] = model.getValue();
+            if (name === state.activeFile) updatePreview();
+            scheduleSave();
+            renderTree();
+          });
+          state.monacoModels.set(name, model);
+        }
+        state.editor.setModel(state.monacoModels.get(name));
+      } else {
+        $("#editorFallback").value = state.files[name];
+      }
+      $("#editorFallback").dataset.file = name;
+      updateCursorStatus();
+      scheduleSave();
+    }
+
+    function closeFile(name) {
+      state.openFiles = state.openFiles.filter(item => item !== name);
+      if (state.activeFile === name) {
+        state.activeFile = state.openFiles[state.openFiles.length - 1]
+          || Object.keys(state.files)[0]
+          || "";
+        if (state.activeFile) openFile(state.activeFile);
+      }
+      renderTabs();
+      scheduleSave();
+    }
+
+    function removeFile(name) {
+      if (name === "index.html") {
+        window.alert("The workspace needs an index.html entry file.");
+        return;
+      }
+      if (!window.confirm(`Remove ${name} from this workspace?`)) return;
+      state.openFiles = state.openFiles.filter(item => item !== name);
+      if (state.monacoModels.has(name)) {
+        state.monacoModels.get(name).dispose();
+        state.monacoModels.delete(name);
+      }
+      delete state.files[name];
+      if (state.activeFile === name) state.activeFile = "";
+      renderTree();
+      openFile(state.openFiles[state.openFiles.length - 1] || Object.keys(state.files)[0]);
+      scheduleSave();
+    }
+
+    function newFile() {
+      const name = window.prompt("New file path (for example: src/app.js)");
+      if (name === null) return;
+      const cleanName = name.trim();
+      if (!safeFilePath(cleanName) || !supportedFile(cleanName)) {
+        window.alert("Use a supported code file path: HTML, CSS, JS, JSON, Markdown, XML, YAML, TOML, or text.");
+        return;
+      }
+      if (Object.hasOwn(state.files, cleanName)) {
+        window.alert("That file already exists.");
+        return;
+      }
+      if (Object.keys(state.files).length >= MAX_FILES) {
+        window.alert(`A workspace can contain up to ${MAX_FILES} files.`);
+        return;
+      }
+      state.files[cleanName] = "";
+      openFile(cleanName);
+      scheduleSave();
+      logOutput(`Created ${cleanName}.`);
+    }
+
+    function newWorkspace() {
+      if (!window.confirm("Create a new workspace? The current one stays saved in this browser.")) return;
+      state.name = "My Workspace";
+      state.files = { ...DEFAULT_FILES };
+      state.openFiles = [];
+      state.activeFile = "";
+      state.chat = [];
+      $("#chatMessages").replaceChildren($("#emptyChat"));
+      $("#emptyChat").hidden = false;
+      for (const model of state.monacoModels.values()) model.dispose();
+      state.monacoModels.clear();
+      persist();
+      openFile("index.html");
+      updatePreview();
+      logOutput("Created a new workspace.");
+    }
+
+    async function openFolder() {
+      if (!window.showDirectoryPicker) {
+        window.alert("Folder access is not available in this browser. Import or export a workspace JSON file instead.");
+        return;
+      }
+      try {
+        const root = await window.showDirectoryPicker({ mode: "readwrite" });
+        const files = {};
+        let totalBytes = 0;
+        async function readDirectory(directory, prefix = "") {
+          for await (const [name, handle] of directory.entries()) {
+            if (name.startsWith(".") || ["node_modules", "vendor", "dist", "build"].includes(name)) continue;
+            const relative = prefix ? `${prefix}/${name}` : name;
+            if (handle.kind === "directory") {
+              if (relative.split("/").length < 8 && filesCount(files) < MAX_FILES) {
+                await readDirectory(handle, relative);
+              }
+            } else if (supportedFile(name) && filesCount(files) < MAX_FILES) {
+              const file = await handle.getFile();
+              if (file.size > MAX_FILE_BYTES) continue;
+              if (totalBytes + file.size > MAX_PROJECT_BYTES) continue;
+              files[relative] = await file.text();
+              totalBytes += file.size;
+            }
+          }
+        }
+        await readDirectory(root);
+        if (!Object.keys(files).length) {
+          window.alert("No supported code files were found in that folder.");
+          return;
+        }
+        const permission = await root.requestPermission({ mode: "readwrite" });
+        state.folderHandle = permission === "granted" ? root : null;
+        state.name = root.name || "My Workspace";
+        state.files = files;
+        state.openFiles = [];
+        state.activeFile = "";
+        for (const model of state.monacoModels.values()) model.dispose();
+        state.monacoModels.clear();
+        const entry = files["index.html"] ? "index.html" : Object.keys(files)[0];
+        if (!files["index.html"]) logOutput("Folder has no index.html; preview will use its first HTML file when available.");
+        persist();
+        openFile(entry);
+        updatePreview();
+        logOutput(`Opened folder ${state.name}.`);
+      } catch (error) {
+        if (error.name !== "AbortError") {
+          logOutput(`Could not open folder: ${error.message}`);
+          window.alert(`Could not open folder: ${error.message}`);
+        }
+      }
+    }
+
+    function filesCount(files) {
+      return Object.keys(files).length;
+    }
+
+    async function saveWorkspace() {
+      const entries = Object.entries(state.files);
+      if (!entries.length || entries.some(([name, content]) => !safeFilePath(name) || !supportedFile(name) || typeof content !== "string")) {
+        throw new Error("The workspace contains an invalid file.");
+      }
+      let total = 0;
+      for (const [name, content] of entries) {
+        const bytes = new TextEncoder().encode(content).length;
+        if (bytes > MAX_FILE_BYTES) throw new Error(`${name} is too large to save.`);
+        total += bytes;
+      }
+      if (total > MAX_PROJECT_BYTES) throw new Error("The workspace is too large to save.");
+
+      if (state.folderHandle) {
+        let permission = await state.folderHandle.queryPermission({ mode: "readwrite" });
+        if (permission !== "granted") permission = await state.folderHandle.requestPermission({ mode: "readwrite" });
+        if (permission !== "granted") throw new Error("Allow folder write access to save files to disk.");
+        for (const [name, content] of entries) {
+          const parts = name.split("/");
+          let directory = state.folderHandle;
+          for (const part of parts.slice(0, -1)) {
+            directory = await directory.getDirectoryHandle(part, { create: true });
+          }
+          const fileHandle = await directory.getFileHandle(parts[parts.length - 1], { create: true });
+          const writable = await fileHandle.createWritable();
+          await writable.write(content);
+          await writable.close();
+        }
+      }
+      persist();
+      logOutput(state.folderHandle
+        ? `Saved ${entries.length} files to ${state.name}.`
+        : "Workspace saved in this browser. Use Open Folder to write files to disk.");
+    }
+
+    function download(name, content, type) {
+      const url = URL.createObjectURL(new Blob([content], { type }));
+      const link = document.createElement("a");
+      link.href = url;
+      link.download = name;
+      link.click();
+      setTimeout(() => URL.revokeObjectURL(url), 1000);
+    }
+
+    function exportWorkspace() {
+      download(`${state.name.replace(/[^a-zA-Z0-9_-]+/g, "-") || "workspace"}.json`,
+        JSON.stringify({ version: 1, name: state.name, files: state.files }, null, 2),
+        "application/json");
+      logOutput("Exported workspace JSON.");
+    }
+
+    async function importWorkspace(file) {
+      const data = JSON.parse(await file.text());
+      if (!data || typeof data !== "object" || !data.files || typeof data.files !== "object" || Array.isArray(data.files)) {
+        throw new Error("Choose a Ukid workspace JSON export.");
+      }
+      const entries = Object.entries(data.files);
+      if (!entries.length || entries.length > MAX_FILES
+        || entries.some(([name, content]) => !safeFilePath(name) || !supportedFile(name) || typeof content !== "string")) {
+        throw new Error("The workspace file has unsupported or invalid files.");
+      }
+      let totalBytes = 0;
+      for (const [name, content] of entries) {
+        const bytes = new TextEncoder().encode(content).length;
+        if (bytes > MAX_FILE_BYTES) throw new Error(`${name} is too large to import.`);
+        totalBytes += bytes;
+      }
+      if (totalBytes > MAX_PROJECT_BYTES) throw new Error("The workspace file is too large to import.");
+      state.files = Object.fromEntries(entries);
+      state.name = typeof data.name === "string" ? data.name.slice(0, 80) : "Imported Workspace";
+      state.openFiles = [];
+      state.activeFile = "";
+      for (const model of state.monacoModels.values()) model.dispose();
+      state.monacoModels.clear();
+      persist();
+      openFile(state.files["index.html"] ? "index.html" : entries[0][0]);
+      updatePreview();
+      logOutput(`Imported ${entries.length} files.`);
+    }
+
+    function updatePreview() {
+      const entryName = state.files["index.html"] ? "index.html"
+        : Object.keys(state.files).find(name => /\.html?$/i.test(name));
+      if (!entryName) {
+        $("#preview").srcdoc = "<!doctype html><title>No HTML file</title><p>Create an HTML file to preview it.</p>";
+        return;
+      }
+      let html = state.files[entryName];
+      const base = entryName.includes("/") ? entryName.slice(0, entryName.lastIndexOf("/") + 1) : "";
+      const css = state.files[`${base}style.css`] || state.files["style.css"] || "";
+      const js = (state.files[`${base}script.js`] || state.files["script.js"] || "").replace(/<\/script/gi, "<\\/script");
+      html = html.replace(/<link\b(?=[^>]*\bhref\s*=\s*["'](?:\.\/)?style\.css["'])[^>]*>/gi, "");
+      html = html.replace(/<script\b(?=[^>]*\bsrc\s*=\s*["'](?:\.\/)?script\.js["'])[^>]*>\s*<\/script>/gi, "");
+      const styleTag = `<style>${css.replace(/<\/style/gi, "<\\/style")}</style>`;
+      const scriptTag = `<script>${js}<\/script>`;
+      html = /<\/head\s*>/i.test(html) ? html.replace(/<\/head\s*>/i, `${styleTag}</head>`) : `${styleTag}${html}`;
+      html = /<\/body\s*>/i.test(html) ? html.replace(/<\/body\s*>/i, `${scriptTag}</body>`) : `${html}${scriptTag}`;
+      $("#preview").srcdoc = html;
+      $("#outputArea").textContent = `Preview updated from ${entryName}.`;
+    }
+
+    function updateCursorStatus() {
+      const position = state.editor?.getPosition();
+      $("#statusLine").textContent = position ? `Ln ${position.lineNumber}, Col ${position.column}` : "Ln 1, Col 1";
+    }
+
+    function renderMessage(role, text, edits = []) {
+      $("#emptyChat").hidden = true;
+      const card = document.createElement("article");
+      card.className = `chat-message ${role}`;
+      const label = document.createElement("div");
+      label.className = "chat-role";
+      label.textContent = role === "user" ? "You" : "Ollama";
+      const content = document.createElement("div");
+      content.className = "chat-content";
+      content.textContent = text;
+      card.append(label, content);
+      for (const edit of edits) {
+        const item = document.createElement("div");
+        item.className = "edit-card";
+        const filename = document.createElement("strong");
+        filename.textContent = `Suggested edit: ${edit.file}`;
+        const apply = document.createElement("button");
+        apply.type = "button";
+        apply.textContent = "Review and apply";
+        apply.addEventListener("click", () => {
+          if (!Object.hasOwn(state.files, edit.file)) return;
+          if (!window.confirm(`Replace ${edit.file} with Ollama's suggested edit?`)) return;
+          state.files[edit.file] = edit.content;
+          const model = state.monacoModels.get(edit.file);
+          if (model) model.setValue(edit.content);
+          if (edit.file === state.activeFile && !model) $("#editorFallback").value = edit.content;
+          renderTree();
+          updatePreview();
+          scheduleSave();
+          logOutput(`Applied Ollama's suggested edit to ${edit.file}.`);
+          apply.disabled = true;
+          apply.textContent = "Applied";
+        });
+        item.append(filename, document.createElement("br"), apply);
+        card.append(item);
+      }
+      $("#chatMessages").append(card);
+      $("#chatMessages").scrollTop = $("#chatMessages").scrollHeight;
+    }
+
+    async function authHeaders() {
+      if (LOCAL_WORKSPACE) return {};
+      await state.authReady;
+      const user = state.auth?.currentUser;
+      if (!user) throw new Error("Sign in to Ukid Studio to use hosted Ollama AI.");
+      return { Authorization: `Bearer ${await user.getIdToken()}` };
+    }
+
+    async function api(url, options = {}) {
+      const headers = { "Content-Type": "application/json", ...(options.headers || {}) };
+      if (options.auth) Object.assign(headers, await authHeaders());
+      const response = await fetch(url, { ...options, headers });
+      let data;
+      try { data = await response.json(); } catch { data = {}; }
+      if (!response.ok) throw new Error(data.error || `Server returned ${response.status}.`);
+      return data;
+    }
+
+    async function loadModels() {
+      try {
+        const result = await api("/api/learn/health");
+        state.models = Array.isArray(result.models) ? result.models : [];
+        state.model = result.model || state.models[0] || "";
+        const select = $("#modelSelect");
+        select.replaceChildren();
+        for (const model of state.models) {
+          const option = document.createElement("option");
+          option.value = model;
+          option.textContent = model;
+          select.append(option);
+        }
+        select.disabled = !state.models.length;
+        if (state.model) select.value = state.model;
+        $("#statusModel").textContent = state.model ? `Ollama: ${state.model}` : "Ollama unavailable";
+        $("#chatStatus").textContent = state.model
+          ? (result.aiConfigured ? "Ollama ready. Ask about your code." : `Ollama model available; hosted services may need setup. ${result.error || ""}`)
+          : `No Ollama models available. ${result.error || "Check local or hosted Ollama setup."}`;
+        $("#chatStatus").classList.toggle("error", !state.model);
+      } catch (error) {
+        $("#chatStatus").textContent = `Could not connect to Ollama: ${error.message}`;
+        $("#chatStatus").classList.add("error");
+      }
+    }
+
+    function assistantContext() {
+      if (!$("#includeContext").checked) return [];
+      return state.openFiles.slice(0, 8).map(path => ({ path, content: state.files[path] }));
+    }
+
+    async function getAssistantReply(messages) {
+      const payload = {
+        model: state.model,
+        messages,
+        files: assistantContext()
+      };
+      if (LOCAL_WORKSPACE) return api("/api/ide/chat", { method: "POST", body: JSON.stringify(payload) });
+
+      const queued = await api("/api/learn/assistant", {
+        method: "POST",
+        auth: true,
+        body: JSON.stringify(payload)
+      });
+      if (!queued.jobId) throw new Error("The server did not create an assistant request.");
+      await api("/.netlify/functions/learn-assistant-background", {
+        method: "POST",
+        auth: true,
+        body: JSON.stringify({ jobId: queued.jobId })
+      });
+
+      let delay = 1200;
+      const deadline = Date.now() + 180_000;
+      while (Date.now() < deadline) {
+        await new Promise(resolve => setTimeout(resolve, delay));
+        const result = await api(`/api/learn/jobs/${encodeURIComponent(queued.jobId)}`, { auth: true });
+        if (result.job?.status === "complete") return result.job.result;
+        if (result.job?.status === "failed") throw new Error(result.job.error || "Ollama could not answer.");
+        delay = Math.min(Math.round(delay * 1.3), 5000);
+      }
+      throw new Error("Ollama is taking longer than expected. Try a shorter prompt.");
+    }
+
+    async function sendMessage(event) {
+      event?.preventDefault();
+      if (state.busy) return;
+      const content = $("#chatInput").value.trim();
+      if (!content) return;
+      if (!state.model) {
+        $("#chatStatus").textContent = "Ollama is unavailable. Check the Ollama connection and refresh the page.";
+        $("#chatStatus").classList.add("error");
+        return;
+      }
+
+      state.busy = true;
+      $("#sendBtn").disabled = true;
+      $("#modelSelect").disabled = true;
+      $("#chatInput").disabled = true;
+      $("#chatStatus").classList.remove("error");
+      $("#chatStatus").textContent = `Asking ${state.model}…`;
+      const userMessage = { role: "user", content };
+      state.chat.push(userMessage);
+      renderMessage("user", content);
+      $("#chatInput").value = "";
+
+      try {
+        const messages = state.chat.slice(-12);
+        const reply = await getAssistantReply(messages);
+        state.chat.push({ role: "assistant", content: reply.message });
+        renderMessage("assistant", reply.message, reply.edits);
+        $("#chatStatus").textContent = `Answered by Ollama · ${reply.model || state.model}`;
+        logOutput(`Ollama assistant replied using ${reply.model || state.model}.`);
+      } catch (error) {
+        state.chat.pop();
+        $("#chatStatus").textContent = error.message;
+        $("#chatStatus").classList.add("error");
+        renderMessage("assistant", `Ollama request failed: ${error.message}`);
+        logOutput(`Ollama assistant failed: ${error.message}`);
+      } finally {
+        state.busy = false;
+        $("#sendBtn").disabled = false;
+        $("#modelSelect").disabled = !state.models.length;
+        $("#chatInput").disabled = false;
+        $("#chatInput").focus();
+      }
+    }
+
+    function initMonaco() {
+      const fallback = $("#editorFallback");
+      fallback.style.display = "block";
+      fallback.addEventListener("input", () => {
+        const name = fallback.dataset.file;
+        if (name) state.files[name] = fallback.value;
+        updatePreview();
+        scheduleSave();
+        renderTree();
+      });
+      fallback.addEventListener("keydown", event => {
+        if (event.key === "Tab") {
+          event.preventDefault();
+          const start = fallback.selectionStart;
+          fallback.setRangeText("  ", start, fallback.selectionEnd, "end");
+        }
+      });
+      if (!window.require) {
+        $("#statusWorkspace").textContent = "● Editor fallback";
+        logOutput("Monaco could not load; using the built-in code editor.");
+        return;
+      }
+      window.MonacoEnvironment = {
+        getWorkerUrl: () => `data:text/javascript;charset=utf-8,${encodeURIComponent(`self.MonacoEnvironment={baseUrl:'${MONACO_BASE}'};importScripts('${MONACO_BASE}vs/base/worker/workerMain.js');`)}`
+      };
+      window.require.config({ paths: { vs: `${MONACO_BASE}vs` } });
+      window.require(["vs/editor/editor.main"], () => {
+        window.monaco.editor.defineTheme("ukid-ide", {
+          base: "vs-dark", inherit: true, rules: [],
+          colors: {
+            "editor.background": "#1e1f22",
+            "editorLineNumber.foreground": "#737780",
+            "editorLineNumber.activeForeground": "#ffb27b",
+            "editorCursor.foreground": "#ff984d",
+            "editor.selectionBackground": "#713d2480"
+          }
+        });
+        for (const name of state.openFiles) {
+          state.monacoModels.set(name, window.monaco.editor.createModel(state.files[name], languageFor(name)));
+        }
+        state.editor = window.monaco.editor.create($("#editor"), {
+          model: state.monacoModels.get(state.activeFile),
+          theme: "ukid-ide",
+          automaticLayout: true,
+          minimap: { enabled: false },
+          fontFamily: "'Cascadia Code', Consolas, monospace",
+          fontSize: 13,
+          lineHeight: 21,
+          tabSize: 2,
+          wordWrap: "on",
+          scrollBeyondLastLine: false,
+          padding: { top: 12, bottom: 12 },
+          smoothScrolling: true
+        });
+        for (const [name, model] of state.monacoModels) {
+          model.onDidChangeContent(() => {
+            state.files[name] = model.getValue();
+            if (name === state.activeFile) updatePreview();
+            scheduleSave();
+            renderTree();
+          });
+        }
+        state.editor.onDidChangeCursorPosition(updateCursorStatus);
+        fallback.style.display = "none";
+        $("#statusWorkspace").textContent = "● Ready";
+        updatePreview();
+      }, error => {
+        logOutput(`Monaco failed to load: ${error?.message || "unknown error"}. Using the built-in editor.`);
+      });
+    }
+
+    function toggleAssistant() {
+      $("#assistantPanel").classList.toggle("collapsed");
+      $("#assistantToggle").classList.toggle("active", !$("#assistantPanel").classList.contains("collapsed"));
+    }
+
+    $("#newFileBtn").addEventListener("click", newFile);
+    $("#workspaceMenuBtn").addEventListener("click", newWorkspace);
+    $("#renameProjectBtn").addEventListener("click", () => {
+      const name = window.prompt("Workspace name", state.name);
+      if (name?.trim()) {
+        state.name = name.trim().slice(0, 80);
+        persist();
+      }
+    });
+    $("#openFolderBtn").addEventListener("click", openFolder);
+    $("#saveBtn").addEventListener("click", () => saveWorkspace().catch(error => {
+      setSaveState(error.message, true);
+      logOutput(`Save failed: ${error.message}`);
+      window.alert(error.message);
+    }));
+    $("#exportBtn").addEventListener("click", exportWorkspace);
+    $("#importBtn").addEventListener("click", () => $("#importFileInput").click());
+    $("#importFileInput").addEventListener("change", async event => {
+      const [file] = event.target.files;
+      if (!file) return;
+      try { await importWorkspace(file); }
+      catch (error) { window.alert(`Import failed: ${error.message}`); }
+      event.target.value = "";
+    });
+    $("#runBtn").addEventListener("click", () => {
+      updatePreview();
+      setPanel("preview");
+      $("#statusWorkspace").textContent = "● Preview updated";
+      logOutput("Ran workspace preview.");
+    });
+    $("#refreshPreviewBtn").addEventListener("click", updatePreview);
+    $("#previewTab").addEventListener("click", () => setPanel("preview"));
+    $("#outputTab").addEventListener("click", () => setPanel("output"));
+    $("#chatForm").addEventListener("submit", sendMessage);
+    $("#modelSelect").addEventListener("change", () => {
+      state.model = $("#modelSelect").value;
+      $("#statusModel").textContent = `Ollama: ${state.model}`;
+    });
+    $("#assistantToggle").addEventListener("click", toggleAssistant);
+    $("#toggleAssistantBtn").addEventListener("click", toggleAssistant);
+    $("#explorerToggle").addEventListener("click", () => {
+      const hidden = $("#explorer").hidden;
+      $("#explorer").hidden = !hidden;
+      $("#explorerToggle").classList.toggle("active", hidden);
+    });
+
+    document.addEventListener("keydown", event => {
+      if ((event.ctrlKey || event.metaKey) && event.key.toLowerCase() === "s") {
+        event.preventDefault();
+        $("#saveBtn").click();
+      }
+      if ((event.ctrlKey || event.metaKey) && event.key === "Enter") {
+        event.preventDefault();
+        $("#runBtn").click();
+      }
+      if ((event.ctrlKey || event.metaKey) && event.shiftKey && event.key.toLowerCase() === "i") {
+        event.preventDefault();
+        if ($("#assistantPanel").classList.contains("collapsed")) toggleAssistant();
+        $("#chatInput").focus();
+      }
+    });
+
+    loadWorkspace();
+    renderTree();
+    initMonaco();
+    updatePreview();
+    persist();
+    if (!LOCAL_WORKSPACE) {
+      try {
+        const app = initializeApp(firebaseConfig);
+        state.auth = getAuth(app);
+        state.authReady = new Promise(resolve => {
+          const unsubscribe = onAuthStateChanged(state.auth, () => {
+            unsubscribe();
+            resolve();
+          }, resolve);
+        });
+      } catch (error) {
+        $("#chatStatus").textContent = `Firebase sign-in could not initialize: ${error.message}`;
+        $("#chatStatus").classList.add("error");
+      }
+    }
+    await loadModels();
+  </script>
+</body>
+</html>

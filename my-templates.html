@@ -1,0 +1,124 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>My Templates | Ukid Studio</title>
+<meta name="description" content="Manage and organize your coding templates in Ukid Studio.">
+<meta name="theme-color" content="#0b0e14">
+<link rel="manifest" href="manifest.json">
+<link rel="icon" href="CodeVault%20Coding%20Templates%20Logo.png" type="image/png">
+<script src="pwa.js" defer></script>
+<link rel="stylesheet" href="dashboard.css">
+<link rel="stylesheet" href="my-templates.css">
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css"/>
+<style>
+.manage-top{display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:12px;margin-bottom:18px}
+.manage-stats{display:flex;gap:10px}
+.m-stat{background:#101010;border:1px solid rgba(255,255,255,0.07);border-radius:10px;padding:10px 16px;display:flex;flex-direction:column}
+.m-stat strong{font-size:18px}
+.m-stat span{font-size:10px;color:#777;text-transform:uppercase;letter-spacing:.08em}
+.empty-state{text-align:center;padding:60px 20px;background:#0e0e0e;border:1px dashed rgba(255,255,255,0.1);border-radius:16px;grid-column:1/-1}
+.empty-state i{font-size:40px;color:#222;margin-bottom:14px;display:block}
+.edit-modal{max-width:600px!important}
+.btn-danger{background:#1a0f0f!important;border-color:#3a1a1a!important;color:#ff5f56!important}
+.btn-danger:hover{background:#ff5f56!important;color:#fff!important;border-color:#ff5f56!important}
+.status-toggle{cursor:pointer}
+.premium-badge{background:linear-gradient(135deg,#ff7200,#ff9f43);color:#fff;font-size:10px;padding:3px 8px;border-radius:20px;font-weight:700}
+.admin-only{display:none}
+.admin-only.show{display:block}
+</style>
+</head>
+<body class="dashboard-page">
+<div class="app-shell">
+<div class="sidebar-overlay" id="sidebarOverlay3"></div>
+<aside class="dashboard-sidebar" id="dashboardSidebar3">
+  <div class="sidebar-top">
+    <a href="/" class="sidebar-brand"><img class="brand-mark" src="CodeVault%20Coding%20Templates%20Logo.png" alt=""><span class="brand-text"><strong>Ukid<span>.</span></strong><small>Studio</small></span></a>
+    <button class="mobile-close" id="mobileClose3">×</button>
+  </div>
+  <div class="sidebar-user-card"><img id="userAvatar" src="https://ui-avatars.com/api/?name=U&background=ff7200&color=fff"><div><strong id="userName">Loading...</strong><small id="userEmail">...</small></div></div>
+  <nav class="sidebar-nav">
+    <p class="nav-label">Workspace</p>
+    <a href="dashboard.html" class="nav-item"><i class="fas fa-th-large nav-icon"></i> <span>Overview</span></a>
+    <a href="templates.html" class="nav-item"><i class="fas fa-layer-group nav-icon"></i> <span>Community</span></a>
+    <a href="my-templates.html" class="nav-item active"><i class="fas fa-user nav-icon"></i> <span>My Templates</span><span class="nav-count" id="myCountNav">0</span></a>
+  </nav>
+</aside>
+
+<main class="dashboard-main">
+  <header class="dashboard-topbar">
+    <div class="topbar-left"><button class="mobile-menu" id="mobileMenu3"><i class="fas fa-bars"></i></button><div><p class="eyebrow">Manage</p><h1>My Templates</h1></div></div>
+    <div class="topbar-actions">
+      <div class="global-search"><i class="fas fa-search"></i><input type="search" id="mySearch" placeholder="Search my templates..."></div>
+      <button class="primary-btn" id="newTemplateBtn"><i class="fas fa-plus"></i> New</button>
+    </div>
+  </header>
+
+  <div class="dashboard-content">
+    <div class="manage-top">
+      <div class="manage-stats">
+        <div class="m-stat"><strong id="totalMy">0</strong><span>Total</span></div>
+        <div class="m-stat"><strong id="publicMy" style="color:#00ff88">0</strong><span>Public</span></div>
+        <div class="m-stat"><strong id="privateMy" style="color:#888">0</strong><span>Private</span></div>
+        <div class="m-stat"><strong id="copiesMy">0</strong><span>Copies</span></div>
+        <div class="m-stat admin-only" id="premiumStat"><strong id="premiumMy" style="color:#ff7200">0</strong><span>Premium</span></div>
+      </div>
+      <div class="categories">
+        <button class="category-btn active" data-filter="all">All</button>
+        <button class="category-btn" data-filter="public">Public</button>
+        <button class="category-btn" data-filter="private">Private</button>
+        <button class="category-btn admin-only" data-filter="premium" id="premiumFilterBtn"><i class="fas fa-crown"></i> Premium</button>
+      </div>
+    </div>
+
+    <p class="result-text" id="resultText">Loading your templates...</p>
+    <div class="templates" id="myTemplatesGrid"></div>
+  </div>
+</main>
+</div>
+
+<!-- EDIT MODAL - WITH ADMIN PREMIUM TOGGLE -->
+<div class="modal-backdrop" id="editModal">
+  <div class="modal create-modal edit-modal">
+    <button class="modal-close" id="closeEdit">×</button>
+    <h2><i class="fas fa-pen" style="color:#ff7200"></i> Edit Template</h2>
+    <p class="modal-sub" id="editSub">Update your snippet</p>
+    <label>Title<input type="text" id="eTitle"></label>
+    <div class="row-2"><label>Category<select id="eCategory"><option value="html">HTML</option><option value="css">CSS</option><option value="js">JavaScript</option><option value="tailwind">Tailwind</option><option value="react">React</option><option value="forms">Forms</option><option value="layout">Layout</option><option value="landing">Landing</option></select></label><label>Language<select id="eLang"><option value="html">HTML</option><option value="css">CSS</option><option value="js">JavaScript</option><option value="tailwind">Tailwind</option><option value="react">React</option></select></label></div>
+    <label>Description<input type="text" id="eDesc"></label>
+    <label>Code<textarea id="eCode" rows="10"></textarea></label>
+    
+    <div class="publish-row">
+      <label class="switch-label"><input type="checkbox" id="ePublic"><span class="switch"></span><div><strong id="ePublicText">Publish Publicly</strong><small>Everyone can see this</small></div></label>
+      <span class="public-badge" id="eBadge"><i class="fas fa-globe"></i> Public</span>
+    </div>
+
+    <!-- ADMIN ONLY - PREMIUM TOGGLE -->
+    <div id="editPremiumRow" class="admin-only" style="margin-top:12px; padding:12px; background:#fff7ed; border:1px dashed #ff7200; border-radius:10px">
+      <label class="switch-label" style="margin:0"><input type="checkbox" id="ePremium"><span class="switch"></span><div><strong><i class="fas fa-crown" style="color:#ff7200"></i> Premium Template</strong><small>Users watch ad to unlock - you earn</small></div></label>
+    </div>
+
+    <div style="display:flex;gap:10px;margin-top:16px">
+      <button class="primary-btn large" id="updateBtn" style="flex:1;justify-content:center"><i class="fas fa-save"></i> Save Changes</button>
+      <button class="btn btn-danger" id="deleteBtn" style="padding:13px 18px"><i class="fas fa-trash"></i></button>
+    </div>
+  </div>
+</div>
+
+<!-- PREVIEW MODAL -->
+<div class="modal-backdrop" id="previewModal">
+  <div class="modal preview-modal-large">
+    <div class="preview-header"><div class="preview-tabs"><span class="dot red"></span><span class="dot yellow"></span><span class="dot green"></span><small id="previewTitle">Preview</small></div><div class="preview-actions"><button class="btn-sm" id="openNewTab"><i class="fas fa-external-link-alt"></i> New Tab</button><button class="modal-close" id="closePreview">×</button></div></div>
+    <iframe id="previewFrame" class="preview-iframe" sandbox="allow-scripts allow-same-origin"></iframe>
+  </div>
+</div>
+
+<div class="dashboard-toast" id="toast"></div>
+
+<script type="module">
+window.isAdmin = false;
+</script>
+
+<script type="module" src="my-templates.js"></script>
+</body>
+</html>

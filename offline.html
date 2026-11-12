@@ -1,0 +1,33 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="theme-color" content="#0b0e14">
+  <title>You're offline | Ukid Studio</title>
+  <link rel="icon" href="CodeVault%20Coding%20Templates%20Logo.png" type="image/png">
+  <style>
+    *{box-sizing:border-box}
+    body{min-height:100vh;margin:0;padding:24px;display:grid;place-items:center;background:#0b0e14;color:#f4f6fb;font:16px/1.6 Inter,system-ui,sans-serif}
+    main{width:min(100%,520px);padding:36px;border:1px solid rgba(255,255,255,.1);border-radius:24px;background:linear-gradient(145deg,#171d28,#10141d);box-shadow:0 24px 80px rgba(0,0,0,.35)}
+    img{width:64px;height:64px;object-fit:contain}
+    h1{margin:24px 0 8px;font-size:clamp(28px,7vw,40px);line-height:1.1;letter-spacing:-.04em}
+    p{color:#a1aabc}
+    nav{display:flex;flex-wrap:wrap;gap:12px;margin-top:24px}
+    a,button{display:inline-flex;align-items:center;justify-content:center;min-height:44px;padding:10px 16px;border:1px solid rgba(255,255,255,.14);border-radius:12px;background:#1a2130;color:#f4f6fb;font:inherit;text-decoration:none;cursor:pointer}
+    a:first-child,button{border-color:transparent;background:linear-gradient(120deg,#ff9a51,#ff7928);color:#24140b;font-weight:700}
+  </style>
+</head>
+<body>
+  <main>
+    <img src="CodeVault%20Coding%20Templates%20Logo.png" alt="Ukid Studio">
+    <h1>You're offline</h1>
+    <p>Previously opened pages are available offline. Some features, including sign-in, saving templates, and sending messages, need an internet connection.</p>
+    <nav>
+      <a href="index.html">Open home</a>
+      <a href="courses.html">Browse courses</a>
+      <button type="button" onclick="location.reload()">Try again</button>
+    </nav>
+  </main>
+</body>
+</html>

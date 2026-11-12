@@ -1,0 +1,148 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="description" content="Meet Uakunda Madula, known as Ukid: a 14-year-old student and developer sharing his coding journey, projects, and what he learns along the way.">
+  <meta name="theme-color" content="#0b0e14">
+  <link rel="manifest" href="manifest.json">
+  <link rel="icon" href="CodeVault%20Coding%20Templates%20Logo.png" type="image/png">
+  <script src="pwa.js" defer></script>
+  <link rel="stylesheet" href="style.css">
+  <link rel="stylesheet" href="dashboard.css">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
+  <title>About Ukid | Ukid Studio</title>
+  <style>
+    :root {
+      --about-bg:#0b0e14;
+      --about-panel:#121925;
+      --about-line:rgba(219,228,244,.11);
+      --about-text:#f4f6fb;
+      --about-muted:#a1aabc;
+      --about-orange:#ff8738;
+    }
+    body { margin:0;background:var(--about-bg);color:var(--about-text); }
+    .about-page { width:min(1120px,100% - 36px);margin:0 auto; }
+    .about-nav { min-height:76px;display:flex;align-items:center;justify-content:space-between;gap:20px;border-bottom:1px solid var(--about-line); }
+    .about-nav .brand { display:flex;align-items:center;gap:10px;color:var(--about-text);font-weight:750;text-decoration:none; }
+    .about-nav .brand img { width:38px;height:38px;object-fit:contain; }
+    .about-nav nav { display:flex;align-items:center;gap:clamp(12px,3vw,28px); }
+    .about-nav nav a { color:var(--about-muted);font-size:13px;text-decoration:none;transition:color .2s ease; }
+    .about-nav nav a:hover,.about-nav nav a[aria-current="page"] { color:var(--about-orange); }
+    .about-hero { position:relative;overflow:hidden;padding:clamp(60px,10vw,112px) 0 64px; }
+    .about-hero::before { position:absolute;z-index:-1;top:6px;right:-90px;width:420px;height:420px;border-radius:50%;background:radial-gradient(circle,rgba(255,135,56,.14),transparent 68%);content:"";pointer-events:none; }
+    .about-kicker,.section-kicker { color:var(--about-orange);font-size:11px;font-weight:800;letter-spacing:.16em;text-transform:uppercase; }
+    .about-hero h1 { max-width:820px;margin:18px 0;font-size:clamp(42px,8vw,82px);line-height:.98;letter-spacing:-.065em; }
+    .about-hero h1 span { color:var(--about-orange); }
+    .about-lead { max-width:680px;margin:0;color:var(--about-muted);font-size:clamp(16px,2vw,19px);line-height:1.8; }
+    .about-actions { display:flex;flex-wrap:wrap;gap:12px;margin-top:30px; }
+    .about-button { display:inline-flex;align-items:center;justify-content:center;gap:9px;min-height:44px;padding:0 16px;border:1px solid var(--about-line);border-radius:10px;color:var(--about-text);font-size:13px;font-weight:700;text-decoration:none;transition:transform .2s ease,border-color .2s ease,background .2s ease; }
+    .about-button:hover { transform:translateY(-2px);border-color:rgba(255,135,56,.55); }
+    .about-button.primary { border-color:transparent;background:linear-gradient(120deg,#ff9a51,#ff7928);color:#24140b; }
+    .about-story { display:grid;grid-template-columns:minmax(0,1.3fr) minmax(250px,.7fr);gap:22px;padding:28px 0 72px; }
+    .story-card,.maker-card,.skill-card { border:1px solid var(--about-line);border-radius:18px;background:linear-gradient(145deg,rgba(255,255,255,.025),transparent 65%),var(--about-panel); }
+    .story-card { padding:clamp(24px,5vw,42px); }
+    .story-card h2,.skills-section h2 { margin:10px 0 16px;font-size:clamp(25px,4vw,36px);letter-spacing:-.04em; }
+    .story-card p,.maker-card p,.skills-intro { color:var(--about-muted);font-size:14px;line-height:1.85; }
+    .story-card p { margin:0 0 14px; }
+    .story-card p:last-child { margin-bottom:0; }
+    .maker-card { display:flex;flex-direction:column;justify-content:space-between;min-height:290px;padding:26px; }
+    .maker-icon { display:grid;place-items:center;width:52px;height:52px;border:1px solid rgba(255,135,56,.24);border-radius:15px;background:rgba(255,135,56,.1);color:var(--about-orange);font-size:21px; }
+    .maker-card h2 { margin:25px 0 6px;font-size:25px;letter-spacing:-.04em; }
+    .maker-card p { margin:0; }
+    .maker-note { margin-top:22px;padding-top:16px;border-top:1px solid var(--about-line);color:#d7deea;font-size:12px; }
+    .skills-section { padding:0 0 76px; }
+    .skills-intro { max-width:590px;margin:0 0 22px; }
+    .skill-list { display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:12px; }
+    .skill-card { min-height:115px;padding:18px; }
+    .skill-card i { margin-bottom:17px;color:var(--about-orange);font-size:17px; }
+    .skill-card h3 { margin:0;font-size:14px; }
+    .about-footer { display:flex;justify-content:space-between;gap:16px;flex-wrap:wrap;padding:22px 0 30px;border-top:1px solid var(--about-line);color:#8993a3;font-size:12px; }
+    .about-footer nav { display:flex;gap:18px; }
+    .about-footer a { color:var(--about-muted);text-decoration:none; }
+    .about-footer a:hover { color:var(--about-orange); }
+    @media(max-width:700px) {
+      .about-page { width:min(100% - 28px,1120px); }
+      .about-nav { min-height:68px;flex-wrap:wrap;padding:12px 0; }
+      .about-nav nav { width:100%;justify-content:space-between;gap:10px;padding-bottom:4px; }
+      .about-nav nav a { font-size:12px; }
+      .about-story { grid-template-columns:1fr;padding-bottom:56px; }
+      .maker-card { min-height:240px; }
+      .skill-list { grid-template-columns:repeat(2,minmax(0,1fr)); }
+    }
+    @media(max-width:380px) {
+      .about-nav .brand { font-size:14px; }
+      .skill-card { padding:14px; }
+    }
+    @media(prefers-reduced-motion:reduce) {
+      *,*::before,*::after { scroll-behavior:auto !important;transition:none !important; }
+    }
+  </style>
+</head>
+<body>
+  <div class="about-page">
+    <header class="about-nav">
+      <a class="brand" href="index.html" aria-label="Ukid Studio home">
+        <img src="CodeVault%20Coding%20Templates%20Logo.png" alt="">
+        <span>Ukid Studio</span>
+      </a>
+      <nav aria-label="Main navigation">
+        <a href="index.html">Home</a>
+        <a href="courses.html">Learn</a>
+        <a href="templates.html">Templates</a>
+        <a href="about.html" aria-current="page">About</a>
+      </nav>
+    </header>
+
+    <main>
+      <section class="about-hero">
+        <p class="about-kicker">A student. A developer. Always learning.</p>
+        <h1>Hi, I’m Uakunda.<br>You can call me <span>Ukid.</span></h1>
+        <p class="about-lead">I’m a 14-year-old student at Muelekanyi and a junior developer. I made Ukid Studio to share my coding journey—the games, websites, and apps I build—and to help other people discover how fun it is to create with code.</p>
+        <div class="about-actions">
+          <a class="about-button" href="courses.html">Explore what I’m learning</a>
+        </div>
+      </section>
+
+      <section class="about-story" aria-label="About Ukid">
+        <article class="story-card">
+          <p class="section-kicker">Why I started</p>
+          <h2>This is my coding journey, shared as I go.</h2>
+          <p>I created ukid.netlify.app as a place to share the things I make and the things I learn along the way. Every project is a chance to try an idea, solve a problem, and get better at building for the web.</p>
+          <p>Ukid is my name online and the name behind Ukid Studio. I hope this platform encourages other beginners to experiment, keep learning, and make something of their own.</p>
+        </article>
+        <aside class="maker-card">
+          <div>
+            <div class="maker-icon"><i class="fas fa-code" aria-hidden="true"></i></div>
+            <h2>Made by Ukid</h2>
+            <p>A young developer sharing real projects, experiments, and lessons from the journey.</p>
+          </div>
+          <div class="maker-note">Learning by building · Sharing to help others</div>
+        </aside>
+      </section>
+
+      <section class="skills-section" aria-labelledby="skills-title">
+        <p class="section-kicker">Tools I build with</p>
+        <h2 id="skills-title">What I’m exploring</h2>
+        <p class="skills-intro">These are some of the technologies I use while making my projects. I’m still learning, and that’s part of the fun.</p>
+        <div class="skill-list">
+          <article class="skill-card"><i class="fab fa-html5" aria-hidden="true"></i><h3>HTML</h3></article>
+          <article class="skill-card"><i class="fab fa-css3-alt" aria-hidden="true"></i><h3>CSS</h3></article>
+          <article class="skill-card"><i class="fab fa-js" aria-hidden="true"></i><h3>JavaScript</h3></article>
+          <article class="skill-card"><i class="fas fa-cube" aria-hidden="true"></i><h3>Three.js</h3></article>
+          <article class="skill-card"><i class="fas fa-fire" aria-hidden="true"></i><h3>Firebase</h3></article>
+        </div>
+      </section>
+    </main>
+
+    <footer class="about-footer">
+      <span>© 2026 Ukid Studio · Built and shared by Ukid.</span>
+      <nav aria-label="Footer navigation">
+        <a href="privacy.html">Privacy</a>
+        <a href="terms.html">Terms</a>
+        <a href="contact.html">Contact</a>
+      </nav>
+    </footer>
+  </div>
+</body>
+</html>
